@@ -38,14 +38,18 @@ use_missing_code <- function(entity_list) {
         
         # get missingValueCode
         code <- attrs[indices[i], "missingValueCode"]
-        
+
         # substitute where data matches code with NAs
         is.na(dat[[i]]) <-
           as.character(dat[[i]]) == as.character(code)
+
+        # insert data back in
+        entity_list[["data"]] <- dat
       }
     }
-  }
+  } else message("attribute_metadata not a list item and/or missingValueCode not a column in attribute metadata. Double check list input to match with metajam list output structure.")
   
+
   # ---
   # return the same list but with NAs substituted for missing codes, or as-is if not successful
   return(entity_list)
