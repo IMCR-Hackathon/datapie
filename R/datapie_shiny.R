@@ -78,10 +78,10 @@ datapie_shiny <- function( dataset = NA ) {
                    ),
                  conditionalPanel(
                    condition = "input.tabs == 'Report'",
-                   h4("Overall and variable-by-variable summaries and plots"),
+                   h3("Overall and variable-wise summary tables and plots for the selected data table"),
                    actionButton("generate_example_report", "Generate report"),
-                   h4("If using DOI, remember to select a file. Now wait. Once report shows up you can view and download."),
-                   downloadButton("download_report", "Download report (HTML)")
+                   p("The report might take some time to load. Meanwhile, feel free to navigate away from this tab."),
+                   downloadButton("download_report", "Download (HTML)")
                  ),
                  
                  conditionalPanel(
