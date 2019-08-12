@@ -8,8 +8,7 @@
 #' @param entity_df (data.frame) A data frame containing data. In this package context, this is most often the "data" child element within a metajam list output for a data entity.
 #' @param varname (character) Name for a POSIXct-type or Date-type column within the given data frame.
 #'
-#' @return
-#'   (data frame) A summary table of time (POSIX, Date) objects.
+#' @return (data.frame) A summary table of time (POSIX, Date) objects.
 #'
 
 summarize_time_var <- function(entity_df, varname) {
