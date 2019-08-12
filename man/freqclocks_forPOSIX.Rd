@@ -2,15 +2,17 @@
 % Please edit documentation in R/freqclocks_forPOSIX.R
 \name{freqclocks_forPOSIX}
 \alias{freqclocks_forPOSIX}
-\title{freqclocks_forPOSIX}
+\title{Create frequency of data plots for POSIXct-type data.}
 \usage{
-freqclocks_forPOSIX(df, var, varname)
+freqclocks_forPOSIX(df, varname)
 }
 \arguments{
-\item{data.df3}{Define this parameter.}
+\item{entity_df}{(data.frame) A data frame containing data. In this package context, this is most often the "data" child element within a metajam list output for a data entity.}
+
+\item{varname}{(character) Name for a POSIXct-type column within the given data frame.}
 }
 \value{
-(ggplot clocks) Of the frequency of data occurring at different time frequencies, if POSIX type data.
+Ggplot-type graphs of the frequency of data occurring at different time frequencies, if POSIX type data.
 }
 \description{
 This function creates ggplot clocks of the frequency of data occurring at different time frequencies, if POSIX type data.

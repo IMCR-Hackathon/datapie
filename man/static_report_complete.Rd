@@ -7,12 +7,12 @@
 static_report_complete(entity_list, output_path, shiny = F)
 }
 \arguments{
-\item{entity_list}{(list) A list object containing information on a single data entity in metajam output format.}
+\item{entity_list}{(list) A list containing information on a single data entity in metajam output format.}
 
 \item{output_path}{(character) Path to save complete HTML report to. If "ask", a Rstudio pop-up window appears allowing choice of save directory (requires RStudio >= 1.1.287).}
 }
 \value{
-A HTML file with complete static on the chosen data entity.
+A HTML file with complete report on the chosen data entity.
 }
 \description{
 Wrapper function to generate complete HTML report: entity-level  plus variable-level reports for one entity.

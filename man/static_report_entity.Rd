@@ -10,8 +10,8 @@ static_report_entity(entity_df)
 \item{entity_df}{(data.frane) (data.frame) A data.frame containing entity-level data. The "data" child element of an entity-level list object in metajam output format.}
 }
 \value{
-A list containing entity-level report items.
+(list) A list containing entity-level report items.
 }
 \description{
-Generate entity-level report.
+
 }
