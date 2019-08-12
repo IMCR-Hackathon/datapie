@@ -1,29 +1,22 @@
-#' SummaryTable2
-#' 
-#' Describe what this function does
-#' 
+#' Summarize levels of categorical variables.
+#'
+#' Create a summary table with level-wise statistics for categorical variables.
+#'
 #' @usage
-#'   SummaryTable2(data.df3)
+#'   summarize_cat_levels(entity_df)
 #'
-#' @param data.df3
-#'   Define this parameter.
+#' @param entity_df (data.frame) A data.frame containing entity-level data. The "data" child element of an entity-level list object in metajam output format.
 #'
-#' @return
-#'   What does this function return?
-#' 
+#' @return (data.frame) A table with level-wise statistics for categorical variables.
+#'
 #' @import magrittr
-#' 
-#' @export
-#'
 
-SummaryTable2<-function(data.df3)  {
-  SummaryTable_Categorical_Individual <- data.df3 %>% 
-    dplyr::select_if(~!is.numeric(.) & length(unique(.)) < 50) %>%
-    tidyr::gather(key="column_name", value="level") %>%
-    dplyr::group_by(column_name) %>%
-    dplyr::summarize(Total_Values = length(level),
-              n_Categories = length(unique(level)),
-              missingCount = sum(is.na(level))
-    )
+summarize_cat_levels <- function(entity_df)  {
+  SummaryTable_Categorical_Individual <- entity_df %>%
+    dplyr::select_if( ~ !is.numeric(.) & length(unique(.)) < 20) %>%
+    tidyr::gather(key = "column_name", value = 'level') %>%
+    dplyr::group_by(column_name, level) %>%
+    dplyr::tally() %>%
+    dplyr::mutate(NAs = sum(is.na(level)))
   return(SummaryTable_Categorical_Individual)
 }
