@@ -19,8 +19,7 @@ freqclocks_forPOSIX <- function(entity_df, varname) {
   na.df[, varname] <- entity_df[, varname]
   long.df <-
     tidyr::gather(na.df, key = column.name, value = count, -varname)
-  return(long.df)
-  
+
   # plot how much data there is over the time span of the dataset
   freq.timeline <-
     ggplot(long.df[long.df$count %in% TRUE, ], aes(x = long.df[long.df$count %in% TRUE, 1], group = column.name)) +
