@@ -2,16 +2,14 @@
 % Please edit documentation in R/freqclocks_forDates.R
 \name{freqclocks_forDates}
 \alias{freqclocks_forDates}
-\title{freqclocks_forDates}
+\title{Create frequency of data plots for POSIXct-type data.}
 \usage{
 freqclocks_forDates(df, var, varname)
 }
 \arguments{
-\item{df}{Define this parameter.}
+\item{entity_df}{(data.frame) A data frame containing data. In this package context, this is most often the "data" child element within a metajam list output for a data entity.}
 
-\item{var}{Define this parameter.}
-
-\item{varname}{Define this parameter.}
+\item{varname}{(character) Name for a Date-type column within the given data frame.}
 }
 \value{
 (ggplot clocks) Of the frequency of data occurring at different time frequencies, if Date type data.

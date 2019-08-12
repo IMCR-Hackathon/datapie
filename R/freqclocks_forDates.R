@@ -10,9 +10,6 @@
 #' 
 #' @return
 #'   (ggplot clocks) Of the frequency of data occurring at different time frequencies, if Date type data.
-#' 
-#' @export
-#'
 
 freqclocks_forDates <- function(entity_df, varname) {
   
