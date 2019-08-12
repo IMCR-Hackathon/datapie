@@ -6,6 +6,9 @@
 #' @param space_cols (character vector) Output from \code{space_detective}. Where data has explicit spatial columns, a two-element character vector indicating column names containing longitudes and latitudes. Otherwise, spatial plots will not be generated.
 #' 
 #' @return A list object containing variable name and relevant plots.
+#' @import lubridate
+#' @import cowplot
+#' @import scales
 
 
 
@@ -50,9 +53,10 @@ static_report_variable <- function(entity_df, varname, space_cols = space_cols) 
     plots <- NULL
   }
   
-  try(missing <- if (sum(plots$xsummary$num_missing) > 0) {
-    make_missing_plot(var)
-  })
+  # check if any NAs
+  if (anyNA(var)) {
+    missing <- make_missing_plot(var)
+  } else missing <- NULL
 
   # make spatial heatmaps
   space <- space_plot(space_cols = space_cols, df = entity_df, var = varname)
@@ -61,12 +65,8 @@ static_report_variable <- function(entity_df, varname, space_cols = space_cols) 
   var_output <- list(
     var_name = varname,
     plots = plots,
-    missing = if (exists("missing"))
-      missing
-    else NULL,
-    space = if (exists("space"))
-      space
-    else NULL
+    missing = missing,
+    space = space
     )
   
   return(var_output)
