@@ -1,23 +1,18 @@
-#' SummaryTable1
-#' 
-#' Describe what this function does
-#' 
+#' Summarize numerical variables.
+#'
+#' Create a summary table with variable-wise statistics for numerical variables.
+#'
 #' @usage
-#'   SummaryTable1(data.df1)
+#'   summarize_numeric_var(entity_df)
 #'
-#' @param data.df1
-#'   Define this parameter.
+#' @param entity_df (data.frame) A data.frame containing entity-level data. The "data" child element of an entity-level list object in metajam output format.
 #'
-#' @return
-#'   What does this function return?
-#'   
+#' @return (data.frame) A table with variable-wise statistics for numerical variables.
+#'
 #' @import magrittr
-#' 
-#' @export
-#'
 
-SummaryTable1<-function(data.df1)  {
-  SummaryTable_Numeric <- data.df1 %>% 
+summarize_numeric_var<-function(entity_df)  {
+  SummaryTable_Numeric <- entity_df %>% 
     dplyr::select_if(is.numeric) %>%
     tidyr::gather(key="column_name", value='value') %>%
     dplyr::group_by(column_name) %>%
