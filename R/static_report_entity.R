@@ -9,8 +9,8 @@
 #'
 
 static_report_entity <- function(entity_df) {
-  list(numvars = SummaryTable1(entity_df),
-       catvars = tryCatch({SummaryTable3(entity_df)}, error = function(cond){return(NULL)}),
-       levels = tryCatch({SummaryTable2(entity_df)}, error = function(cond){return(NULL)})
+  list(numvars = summarize_numeric_var(entity_df),
+       catvars = tryCatch({summarize_cat_var(entity_df)}, error = function(cond){return(NULL)}),
+       levels = tryCatch({summarize_cat_levels(entity_df)}, error = function(cond){return(NULL)})
   )
 }
