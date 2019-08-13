@@ -59,12 +59,12 @@ freqclocks_forPOSIX <- function(entity_df, varname) {
     align = "h",
     rel_widths = c(1, 1)
   )
-  POSIX.plots <- plot_grid(
-    freq.timeline,
-    both.clocks,
-    ncol = 1,
-    align = "v",
-    rel_widths = c(1, 1)
-  )
-  return(POSIX.plots)
+  # POSIX.plots <- plot_grid(
+  #   freq.timeline,
+  #   both.clocks,
+  #   ncol = 1,
+  #   align = "v",
+  #   rel_widths = c(1, 1)
+  # )
+  return(list(timeline = freq.timeline, clock = both.clocks))
 }
