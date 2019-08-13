@@ -5,26 +5,16 @@
 #' @usage
 #'   make_numeric_histogram(df, var, varname)
 #'
-#' @param df
-#'   A dataframe 
-#' @param var
-#'   A numeric column contained in df that will be graphed
-#' @param varname
-#'   A string containing the name of the column to be graphed. 
-#'   This is used only for labeling the graph, so alternative 
-#'   wording can be used, if desired. 
-#'
+#' @param entity_df (data.frame) A data.frame containing entity-level data. The "data" child element of an entity-level list object in metajam output format.
+#' @param varname (character) Name of variable of interest.
+#' 
 #' @return
 #'   A ggplot2 object containing the histogram and density plot for that column
-#' 
-#' @export
-#'
 
-make_numeric_histogram<-function(df,var,varname){
-  library(ggplot2)
-  #varname=deparse(substitute(var))
-  x<-ggplot(df,aes(x=var))+ xlab(varname)+
-    geom_histogram(aes(y=..density..), colour="black", fill="white")+
-    geom_density(alpha=.2, fill="#FF6666") + theme(aspect.ratio = 1/3)
+make_numeric_histogram <- function(entity_df, varname) {
+  x <- ggplot(entity_df, aes(x = entity_df[[varname]])) + xlab(varname) +
+    geom_histogram(aes(y = ..density..), colour = "black", fill = "white") +
+    geom_density(alpha = .2, fill = "#FF6666") + 
+    theme(aspect.ratio = 1/3)
   return(x)
 }
