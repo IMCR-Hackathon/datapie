@@ -40,12 +40,6 @@ freqclocks_forDates <- function(entity_df, varname) {
     theme(legend.position = "none")
   
   # create plot grid layout
-  Date.plots <- plot_grid(
-    freq.timeline,
-    month.clock,
-    ncol = 1,
-    align = "v",
-    rel_widths = c(3, 1)
-  )
-  return(Date.plots)
+  
+  return(list(timeline = freq.timeline, clock = month.clock))
 }
