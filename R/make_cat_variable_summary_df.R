@@ -11,9 +11,6 @@
 #'
 #' @return
 #'   A dataframe containing summary information. 
-#' 
-#' @export
-#'
 
 make_cat_variable_summary_df<-function(var){
   var_type<-class(var)
