@@ -10,9 +10,6 @@
 #'
 #' @return
 #'   (list) A list of POSIX class columns in a data.frame.
-#' 
-#' @export
-#'
 
 make_vector_of_Date_variable_names<-function(df){
   Date_var_name_vector<-c("")
