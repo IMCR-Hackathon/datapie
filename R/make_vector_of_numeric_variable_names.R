@@ -10,9 +10,6 @@
 #'
 #' @return
 #'   What does this function return?
-#' 
-#' @export
-#'
 
 make_vector_of_numeric_variable_names<-function(df){
   numeric_var_name_vector<-c("")

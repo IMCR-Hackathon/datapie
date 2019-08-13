@@ -10,9 +10,6 @@
 #'
 #' @return
 #'   What does this function return?
-#' 
-#' @export
-#'
 
 make_vector_of_categorical_variable_names<-function(df){
   cat_var_name_vector<-c("")
