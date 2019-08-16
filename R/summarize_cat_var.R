@@ -13,14 +13,20 @@
 #' 
 
 summarize_cat_var <- function(entity_df)  {
-  SummaryTable_Categorical <- entity_df %>%
-    dplyr::select_if( ~ !is.numeric(.)) %>%
-    tidyr::gather(key = "column_name", value = "level") %>%
+  cat_var <- entity_df %>%
+    dplyr::select_if( ~ is.character(.)) %>%
+    tidyr::gather(key = "column_name", value = "level")
+  
+  overall <- cat_var %>%
     dplyr::group_by(column_name) %>%
     dplyr::summarize(
-      Total_Values = length(level),
       n_categories = length(unique(level)),
-      NAs = sum(is.na(level))
     )
-  return(SummaryTable_Categorical)
+  
+  # levels <- cat_var %>%
+  #   dplyr::group_by(column_name, level) %>%
+  #   dplyr::tally() %>%
+  #   dplyr::mutate(NAs = sum(is.na(level)))
+  levels <- inspectdf::inspect_cat(entity_df) %>% inspectdf::show_plot()
+  return(list(overall, levels))
 }

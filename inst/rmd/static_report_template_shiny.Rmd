@@ -8,7 +8,7 @@ output:
 ---
 
 ```{r echo = F}
-knitr::opts_chunk$set(comment=NA, echo = F, message = F, warning = F, out.width = '100%', fig.height = 3)
+knitr::opts_chunk$set(comment=NA, echo = F, message = F, warning = F, out.width = '100%', fig.height = 4)
 ```
 
 ---
@@ -16,6 +16,13 @@ knitr::opts_chunk$set(comment=NA, echo = F, message = F, warning = F, out.width 
 &nbsp;
 
 ## Overall data table report
+
+```{r echo = F}
+kable(entity_report[["all"]],
+      col.names = c("Variable", "Class", "No. Values", "No. NAs"),
+      row.names = F)
+
+```
 
 &nbsp;
 
@@ -35,9 +42,7 @@ if (nrow(entity_report[["numvars"]]) > 0) {
          "3rd qu.",
          "Max",
          "Mean",
-         "No. unique",
-         "No. values",
-         "No. NAs"
+         "No. unique"
       )
    )
 } else {
@@ -50,34 +55,35 @@ if (nrow(entity_report[["numvars"]]) > 0) {
 #### Summary of categorical variables
 
 ```{r}
-if (nrow(entity_report[["catvars"]]) > 0) {
-   kable(entity_report[["catvars"]],
+if (!is.null(entity_report[["catvars"]]) ) {
+   kable(entity_report[["catvars"]][[1]],
          align = "l",
          col.names = c("Variable",
-                       "No. values",
-                       "No. levels",
-                       "No. NAs"))
+                       "No. levels"
+         ))
+   
+   entity_report[["catvars"]][[2]]
 } else {
    print("No categorical/character variables found.")
 }
 ```
 
-&nbsp;
+<!-- &nbsp; -->
 
-#### Levels in categorical variables
+<!-- #### Levels in categorical variables -->
 
-```{r}
-if (nrow(entity_report[["levels"]]) > 0) {
-kable(entity_report[["levels"]],
-      align = 'l',
-      col.names = c("Variable",
-                    "Level",
-                    "No. values",
-                    "No. NAs"))
-} else {
-  print("No categorical/character variables found.")
-}
-```
+<!-- ```{r} -->
+<!-- if (!is.null(entity_report[["levels"]])) { -->
+<!-- kable(entity_report[["levels"]], -->
+<!--       align = 'l', -->
+<!--       col.names = c("Variable", -->
+<!--                     "Level", -->
+<!--                     "No. values", -->
+<!--                     "No. NAs")) -->
+<!-- } else { -->
+<!--   print("No categorical/character variables found.") -->
+<!-- } -->
+<!-- ``` -->
 
 &nbsp;
 
@@ -110,15 +116,17 @@ for (i in 1:length(var_report)) {
    cat('\n')
    print(var_report[[i]][["plots"]][["x"]])
    cat('\n')
-   if (!is.null(var_report[[i]][["missing"]])) {
-      print(var_report[[i]][["missing"]])
-      cat('\n')
-   }
+   # if (!is.null(var_report[[i]][["missing"]])) {
+   #    print(var_report[[i]][["missing"]])
+   #    cat('\n')
+   # }
    if (!is.null(var_report[[i]][["space"]])) {
       print(var_report[[i]][["space"]][[1]])
       cat('\n')
-      print(var_report[[i]][["space"]][[2]])
-      cat('\n')
+      if (!is.null(var_report[[i]][["space"]][[2]])) {
+         print(var_report[[i]][["space"]][[2]])
+         cat('\n')
+      }
    }
 }
 ```

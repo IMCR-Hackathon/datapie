@@ -18,7 +18,7 @@ static_report_variable <- function(entity_df, varname, space_cols = space_cols) 
   var <- entity_df[[varname]]
   
   # set ggplot theme
-  theme_set(theme_bw(base_size = 7) + theme(
+  theme_set(theme_bw(base_size = 8) + theme(
     axis.text.x = element_text(angle = 60, hjust = 1),
     plot.background = element_blank(),
     panel.border = element_blank()
@@ -49,19 +49,19 @@ static_report_variable <- function(entity_df, varname, space_cols = space_cols) 
     plots <- NULL
   }
   
-  # check if any NAs
-  if (anyNA(var)) {
-    missing <- make_missing_plot(var)
-  } else missing <- NULL
+  # # check if any NAs
+  # if (anyNA(var)) {
+  #   missing <- plot_missing_values(var)
+  # } else missing <- NULL
 
   # make spatial heatmaps
-  space <- space_plot(space_cols = space_cols, df = entity_df, var = varname)
+  space <- space_plot(space_cols = space_cols, entity_df = entity_df, varname = varname)
   
   # construct list output
   var_output <- list(
     var_name = varname,
     plots = plots,
-    missing = missing,
+    # missing = missing,
     space = space
     )
   

@@ -22,9 +22,7 @@ summarize_numeric_var<-function(entity_df)  {
               quantile_75 = quantile(value, 0.75, na.rm=TRUE),
               max = max(value, na.rm=TRUE), 
               mean = mean(value, na.rm=TRUE),
-              Unique_Values = length(unique(value)),
-              Total_Values = sum(is.finite(value)),
-              NAs= sum(is.na(value))
+              Unique_Values = length(unique(value))
     )
   
   return(SummaryTable_Numeric)

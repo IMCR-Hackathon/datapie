@@ -13,7 +13,7 @@
 
 summarize_cat_levels <- function(entity_df)  {
   SummaryTable_Categorical_Individual <- entity_df %>%
-    dplyr::select_if( ~ !is.numeric(.) & length(unique(.)) < 20) %>%
+    dplyr::select_if( ~ is.character(.) & length(unique(.)) < 20) %>%
     tidyr::gather(key = "column_name", value = 'level') %>%
     dplyr::group_by(column_name, level) %>%
     dplyr::tally() %>%

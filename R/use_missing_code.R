@@ -33,8 +33,8 @@ use_missing_code <- function(entity_list) {
     # column-wise loop
     for (i in 1:length(colnames(dat))) {
       
-      # temporarily excluding dateTime variables: method not applicable to POSIXct variables
-      if (attrs[indices[i], "measurementScale"] != "dateTime") {
+    #  # temporarily excluding dateTime variables: method not applicable to POSIXct variables
+    #  if (attrs[indices[i], "measurementScale"] != "dateTime") {
         
         # get missingValueCode
         code <- attrs[indices[i], "missingValueCode"]
@@ -45,7 +45,7 @@ use_missing_code <- function(entity_list) {
 
         # insert data back in
         entity_list[["data"]] <- dat
-      }
+    #  }
     }
   } else message("attribute_metadata not a list item and/or missingValueCode not a column in attribute metadata. Double check list input to match with metajam list output structure.")
   

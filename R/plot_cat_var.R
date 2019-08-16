@@ -14,7 +14,7 @@
 plot_cat_var <- function(entity_df, varname) {
   x <- ggplot(entity_df, aes(x = entity_df[[varname]])) + 
     xlab(varname) +
-    geom_bar(colour = "black", fill = "#FF6666", alpha = 0.2) + 
+    geom_bar(colour = "black", fill = "#FF6666", alpha = 0.2, width = 0.8) + 
     theme(aspect.ratio = 1 / 3)
   return(x)
 }
