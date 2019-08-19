@@ -23,10 +23,13 @@ summarize_cat_var <- function(entity_df)  {
       n_categories = length(unique(level)),
     )
   
-  # levels <- cat_var %>%
-  #   dplyr::group_by(column_name, level) %>%
-  #   dplyr::tally() %>%
-  #   dplyr::mutate(NAs = sum(is.na(level)))
-  levels <- inspectdf::inspect_cat(entity_df) %>% inspectdf::show_plot()
-  return(list(overall, levels))
+   levels <- cat_var %>%
+    dplyr::group_by(column_name, level) %>%
+    dplyr::tally() %>%
+    dplyr::mutate(NAs = sum(is.na(level)))
+  
+  # a "col_palette" of 1 is a color-blind friendly palette
+  inspectdf_plot <- inspectdf::inspect_cat(entity_df) %>% inspectdf::show_plot(col_palette = 1, high_cardinality = 2)
+  
+  return(list(overall, levels, inspectdf_plot))
 }

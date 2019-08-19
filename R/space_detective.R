@@ -3,15 +3,16 @@
 #' 
 #' Wrapper for \code{\link{classify_xy}}. Runs \code{\link{classify_xy}}, counts number of hits in each dimension, then decides what to depending on those two numbers. 
 #'
-#' @param list Metajam output for a single data entity
+#' @param entity_list (list) Metajam output for a single data entity
+#' @param report (logical) Whether the function is used in the report-making environment. Defaults to FALSE.
 #' 
-#' @return A character vector whose two elements are named "lat_col" and "lon_col", indicating the names of columns containing lat and lon information respectively, or an error message if not detected or if we aren't equipped to deal with the number of hits we got. 
+#' @return A character vector whose two elements are named "lat_col" and "lon_col", indicating the names of columns containing lat and lon information respectively, or an error message if not detected or if we aren't equipped to deal with the number of hits we got. If report == T, will also output messages.
 #'
 #' @export
 
-space_detective <- function(list) {
-  x_detect <- classify_xy(list, "x")
-  y_detect <- classify_xy(list, "y")
+space_detective <- function(entity_list, report = F) {
+  x_detect <- classify_xy(entity_list, "x")
+  y_detect <- classify_xy(entity_list, "y")
   
   # count hits, assuming all logical. TODO: what to do with possible hits
   
@@ -22,9 +23,11 @@ space_detective <- function(list) {
   # no hits at all
   
   if (x_hits == 0 & y_hits == 0) {
-    return(
-      "Space detective was not able to detect columns containing spatial information. Spatial plots will not be generated."
-    )
+    
+    
+      msg <- "Space detective was not able to detect columns containing spatial information. Spatial plots will not be generated."
+    
+    if (!report) message(msg) else return(c(msg = msg))
   }
   
   # equal hits in both dimensions
@@ -35,27 +38,31 @@ space_detective <- function(list) {
     
     if (x_hits == 1 & y_hits == 1) {
       # get target column names
-      x_col <- list[["attribute_metadata"]][which(as.logical(x_detect)), "attributeName"]
-      y_col <- list[["attribute_metadata"]][which(as.logical(y_detect)), "attributeName"]
+      x_col <- entity_list[["attribute_metadata"]][which(as.logical(x_detect)), "attributeName"]
+      y_col <- entity_list[["attribute_metadata"]][which(as.logical(y_detect)), "attributeName"]
       
-      message(
-        paste("Space detective found a single pair of columns containing spatial information. \n Latitude column: ", y_col, "\n Longitude column: ", x_col, "\n")
-      )
+      msg <- paste("Space detective found a single pair of columns containing spatial information. \n Latitude column: ", y_col, "\n Longitude column: ", x_col, "\n")
       
-      cols <- c(y_col, x_col)
-      names(cols) <- c("lat_col", "lon_col")
-      return(cols)
+      if (!report) message(msg)
+      
+      cols <- c(x_col, y_col)
+      names(cols) <- c("x_col", "y_col")
+      if (report) return(list(msg = msg, cols = cols)) else return(cols)
     } else {
       
       # equal hits and larger than 1
       
-      message("Space detective found equal and larger than 1 numbers of x and y columns. What to do with this information pending. Meanwhile, spatial plots will not be generated.")
+      msg <- "Space detective found equal and larger than 1 numbers of x and y columns. What to do with this information pending. Meanwhile, spatial plots will not be generated."
+      
+      if (!report) message(msg) else return(c(msg = msg))
       
       }
   } else {
     
     # unequal number of hits
     
-    message("Space detective found unequal numbers of x and y columns. What to do with this information pending. Meanwhile, spatial plots will not be generated.")
+    msg <- "Space detective found unequal numbers of x and y columns. What to do with this information pending. Meanwhile, spatial plots will not be generated."
+    if (!report) message(msg) else return(c(msg = msg))
+    
     }
 }

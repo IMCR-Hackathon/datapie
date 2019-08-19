@@ -15,7 +15,7 @@ knitr::opts_chunk$set(comment=NA, echo = F, message = F, warning = F, out.width 
 
 &nbsp;
 
-## Overall data table report
+## All variables
 
 ```{r echo = F}
 kable(entity_report[["all"]],
@@ -26,7 +26,7 @@ kable(entity_report[["all"]],
 
 &nbsp;
 
-#### Summary of numerical variables
+#### Numerical variable(s)
 
 ```{r echo=FALSE}
 if (nrow(entity_report[["numvars"]]) > 0) {
@@ -52,7 +52,7 @@ if (nrow(entity_report[["numvars"]]) > 0) {
 
 &nbsp;
 
-#### Summary of categorical variables
+#### Categorical variable(s)
 
 ```{r}
 if (!is.null(entity_report[["catvars"]]) ) {
@@ -61,44 +61,47 @@ if (!is.null(entity_report[["catvars"]]) ) {
          col.names = c("Variable",
                        "No. levels"
          ))
-   
-   entity_report[["catvars"]][[2]]
 } else {
    print("No categorical/character variables found.")
 }
 ```
 
-<!-- &nbsp; -->
+&nbsp;
 
-<!-- #### Levels in categorical variables -->
-
-<!-- ```{r} -->
-<!-- if (!is.null(entity_report[["levels"]])) { -->
-<!-- kable(entity_report[["levels"]], -->
-<!--       align = 'l', -->
-<!--       col.names = c("Variable", -->
-<!--                     "Level", -->
-<!--                     "No. values", -->
-<!--                     "No. NAs")) -->
-<!-- } else { -->
-<!--   print("No categorical/character variables found.") -->
-<!-- } -->
-<!-- ``` -->
+```{r}
+if(!is.null(entity_report[["catvars"]])) {
+   kable(
+      entity_report[["catvars"]][[2]],
+      align = "l",
+      col.names = c("Variable",
+                    "Level",
+                    "No. values",
+                    "No. NAs")
+   )
+}
+```
 
 &nbsp;
 
+```{r}
+if(!is.null(entity_report[["catvars"]])) {
+      
+   entity_report[["catvars"]][[3]]
+}
+```
+
+&nbsp;
+
+## Temporal variable(s)
+
+
 
 ---
 
-## Temporal information
-
-
----
-
-## Spatial information
+## Spatial variable(s)
 
 ```{r}
-xy <- datapie::space_detective(entity_list)
+space_msg
 ```
 
 

@@ -7,7 +7,7 @@
 #' @param varname Name of variable to make data availability and summary. Remember to enclose in quotes.
 #' @param space_cols A character vector whose two elements are named "lat_col" and "lon_col". Outpur from \code{\link{space_detective}}
 #'
-#' @return For all variables, function returns a data availability plot over the study area. For categorical column types, function returns an extra plot showing most prevalent level of that variable in each spatial grid cell over the study area. For numeric column types, function returns an extra plot showing mean of that variable in each spatial grid cell over the study area. Lat and lon are binned; there are 50 bins normalized to attempt to enforce equal scales along each dimension.
+#' @return For all variables, function returns a data availability plot over the study area. For categorical variables, function returns an extra plot showing most prevalent level of that variable in each spatial grid cell over the study area. For numeric variables, function returns an extra plot showing mean of that variable in each spatial grid cell over the study area. Lat and lon are binned; there are 50 bins normalized to attempt to enforce equal scales along each dimension.
 #'
 #' @export
 
@@ -15,8 +15,8 @@ space_plot <-
   function (entity_df, varname, space_cols = space_cols) {
     if (is.vector(space_cols) & length(space_cols) == 2) {
       var <- entity_df[[varname]]
-      x_col <- entity_df[[space_cols[["lon_col"]]]]
-      y_col <- entity_df[[space_cols[["lat_col"]]]]
+      x_col <- entity_df[[space_cols[["x_col"]]]]
+      y_col <- entity_df[[space_cols[["y_col"]]]]
       
       xrange <-
         max(x_col, na.rm = T) - min(x_col, na.rm = T)

@@ -21,8 +21,9 @@ static_report_complete <- function(entity_list, output_path, shiny = F) {
   entity_report <- static_report_entity(entity_df)
   
   # detect spatial information
-  space_cols <- space_detective(entity_list)
-  
+  space <- space_detective(entity_list, report = T)
+  space_cols <- if("cols" %in% names(space)) space[["cols"]] else NULL
+  space_msg <- space[["msg"]]
   
   # loop over columns in entity data and make variable-level reports
   var_report <- lapply(colnames(entity_df), static_report_variable, entity_df = entity_df, space_cols = space_cols)
@@ -35,7 +36,7 @@ static_report_complete <- function(entity_list, output_path, shiny = F) {
       entity_list = entity_list,
       report_title = paste("Summary report for", entity_list[["summary_metadata"]][1, 2]),
       df = entity_df,
-      space_cols = space_cols,
+      space_msg = space_msg,
       entity_report = entity_report,
       var_report = var_report
       )
