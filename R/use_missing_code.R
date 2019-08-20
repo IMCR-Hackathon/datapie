@@ -27,7 +27,7 @@ use_missing_code <- function(entity_list) {
     
     # ---
     # use match_names
-    indices <- match_names(entity_list)
+    indices <- match_names_2(entity_list)
     
     # ---
     # column-wise loop
@@ -109,8 +109,59 @@ match_names <- function(entity_list) {
   indices[mismatches] <- indices[mismatches[x]]
   }
 
-  # ---
   # return correct vector of indices
   return(indices)
   
+}
+
+# ----------------------------------------------------------------------------------------------
+
+#' Match data and metadata attribute names (alternative logic).
+#' This function matches indices of column names in the data and attributeName's specified in metadata.
+#' 
+#' @usage 
+#'   match_names_2(
+#'     entity_list
+#'     )
+#' 
+#' @param entity_list (list) A list object containing information on a single data entity in metajam output format.
+#'
+#' @return (vector) A numeric vector with row indices in attribute metadata to match column indices in data.
+
+match_names_2 <- function(entity_list) {
+  # ---
+  # get params
+  cols <- tolower(colnames(entity_list[["data"]]))
+  cols_attr <-
+    tolower(entity_list[["attribute_metadata"]][["attributeName"]])
+  indices <- match(cols, cols_attr)
+  
+  # ---
+  # if match is not wholly successful, then attempt partial match
+  
+  if (anyNA(indices)) {
+    indices <- pmatch(cols, cols_attr)
+    
+    # ---
+    # if partial matching metadata -> data is not wholly successful
+    if (anyNA(indices)) {
+      
+      # then partial match data -> metadata
+      indices <- pmatch(cols_attr, cols)
+      
+      # then re-order so that we get the order of metadata -> data
+      new <- c()
+      for (i in 1:length(indices)) {
+        new[i] <- match(i, indices)
+      }
+      indices <- new
+      
+      # if even this is not wholly successful, idk man
+      if (anyNA(indices)){
+        NA_met_dat <- sum(is.na(pmatch(cols, cols_attr)))
+      }
+    }
+  }
+  
+  return(indices)
 }
