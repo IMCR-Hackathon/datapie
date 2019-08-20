@@ -78,10 +78,18 @@ datapie_shiny <- function( dataset = NA ) {
                    ),
                  conditionalPanel(
                    condition = "input.tabs == 'Report'",
-                   h3("Overall and variable-wise summary tables and plots for the selected data table"),
+                   h3("Overall and variable-wise summary tables and plots"),
+                
+                   p("List of reports generated in this session:"),
+                   selectInput("report_to_display", "Select report:", 
+                               choices = "",
+                               selected = "None selected"),
+                   hr(),
                    actionButton("generate_example_report", "Generate report"),
-                   p("The report might take some time to load. Meanwhile, feel free to navigate away from this tab."),
-                   downloadButton("download_report", "Download (HTML)")
+                   p("Click to generate report for the currently select data object. Note that the above drop-down menu should point to \"None selected\". The report might take some time to load. Meanwhile, feel free to navigate away from this tab."),
+                   hr(),
+                   downloadButton("download_report", "Download current (HTML)")
+                   
                  ),
                  
                  conditionalPanel(
@@ -567,9 +575,17 @@ datapie_shiny <- function( dataset = NA ) {
     ################################################
     
     
-    get_report <-
-      
+    get_report <- 
+    # function() {
+      # if (!"No object selected" == input$report_to_display) {
+      #   return(includeHTML(
+      #     file.path(tempdir(), "reports_output", input$report_to_display)
+      #   ))
+      # } else {
+      #   
       # do all this once "generate report" is clicked
+      
+      #return(input$report_to_display)
       
       eventReactive(input$generate_example_report, {
         
@@ -651,11 +667,34 @@ datapie_shiny <- function( dataset = NA ) {
           return("Sorry, we don't currently support report generation for user-uploaded data.")
         }
       })
-    
+
     # render HTMl static report
     
     output$report_html <- renderUI({
+      if("None selected" == input$report_to_display){
       get_report()
+      } else {
+        output$download_report <- downloadHandler(filename = input$report_to_display,
+                                                  content <- function(file) {
+                                                    file.copy(file.path(tempdir(), "reports_output", input$report_to_display), file)
+                                                  },
+                                                  contentType = "text/HTML")
+        includeHTML(file.path(tempdir(), "reports_output", input$report_to_display))
+
+      }
+    })
+    
+    # observe report files present in tempdir
+    observe({
+      #Extract the file names
+      reports <- list.files(file.path(tempdir(), "reports_output"), pattern = "*.html")
+      
+      #Use the file names to populate the dropdown list
+      updateSelectInput(
+        session,
+        "report_to_display",
+        choices = c("None selected", reports),
+        selected = 'None selected')
     })
     
   #####################################
