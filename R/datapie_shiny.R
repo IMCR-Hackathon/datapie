@@ -80,14 +80,17 @@ datapie_shiny <- function( dataset = NA ) {
                    condition = "input.tabs == 'Report'",
                    h3("Overall and variable-wise summary tables and plots"),
                 
-                   p("List of reports generated in this session:"),
-                   selectInput("report_to_display", "Select report:", 
+                   p("List of reports successfully generated in this session:"),
+                   selectInput("report_to_display", "Select report to view:", 
                                choices = "",
                                selected = "None selected"),
                    hr(),
-                   actionButton("generate_example_report", "Generate report"),
-                   p("Click to generate report for the currently select data object. Note that the above drop-down menu should point to \"None selected\". The report might take some time to load. Meanwhile, feel free to navigate away from this tab."),
-                   hr(),
+                   conditionalPanel(
+                     condition = "input.report_to_display == 'None selected'",
+                     actionButton("generate_example_report", "Generate report"),
+                     p("Compile report for the currently select data object. The report might take some time to load; meanwhile, feel free to navigate away from this tab."),
+                     hr()
+                   ),
                    downloadButton("download_report", "Download current (HTML)")
                    
                  ),
