@@ -39,7 +39,7 @@ datapie_shiny <- function( dataset = NA ) {
                      selected = 1),
                    conditionalPanel(
                      condition = "input.data_input=='1'",
-                     helpText("Sample data is loaded. Scroll left to see additional columns.")
+                     h5("Sample data is loaded.")
                      ),
                    conditionalPanel(
                      condition = "input.data_input=='2'",
@@ -78,11 +78,10 @@ datapie_shiny <- function( dataset = NA ) {
                    ),
                  conditionalPanel(
                    condition = "input.tabs == 'Report'",
-                   h4("Overall and variable-wise summary tables and plots for the selected data table"),
+                   h3("Overall and variable-wise summary tables and plots for the selected data table"),
                    actionButton("generate_example_report", "Generate report"),
-                   helpText("The report might take some time to load and will continue even if you navigate away from this tab."),
-                   downloadButton("download_report", "Download report"),
-                   helpText("Report will download as a .html file.")
+                   p("The report might take some time to load. Meanwhile, feel free to navigate away from this tab."),
+                   downloadButton("download_report", "Download (HTML)")
                  ),
                  
                  conditionalPanel(
@@ -99,7 +98,7 @@ datapie_shiny <- function( dataset = NA ) {
                                     selectInput("y_cast", "Y-coerce", choices = c('default', 'character', 'numeric', 'date'))
                    ),
                    conditionalPanel(condition = "input.Type =='Histogram'", # "input.Type!='Density' && input.Type!='Histogram'",
-                                    helpText("There is no relevant Y-variable for histogram plots.")
+                                    p("No Y-variable relevant")
                    ),
                    selectInput("group", "Group (or color)", choices = ""),
                    selectInput("facet_row", "Facet Row", choices = ""),
@@ -137,18 +136,16 @@ datapie_shiny <- function( dataset = NA ) {
                      )
                    ),
                    downloadButton("download_plot_PDF",
-                                  "Download .pdf"),
-                   p(),
+                                  "Download pdf of figure"),
+                   
                    downloadButton("download_plot_Tiff",
-                                  "Download .tiff"),
-                   helpText("Download plot as either a .pdf or .tiff file.")
+                                  "Download tiff of figure")
                    
                  ),
                  
                  conditionalPanel(
                    condition = "input.tabs == 'Code'",
-                   h4("R-Code"),
-                   helpText("Use the code to the right to create the figures from the Plot and Interactive Plot tabs.")
+                   h4("R-Code for creating the static and interactive plots")
                  ),
                  
                  conditionalPanel(
@@ -158,8 +155,7 @@ datapie_shiny <- function( dataset = NA ) {
                  
                  conditionalPanel(
                    condition = "input.tabs == 'About'",
-                   h4("About datapie"),
-                   helpText("A litte metadata about datapie.")
+                   h4("About datapie")
                  )
     ),
     
@@ -1210,7 +1206,7 @@ datapie_shiny <- function( dataset = NA ) {
        if (class(df1)[1]=="numeric") {
          sliderInput("range", "X-range of interest:", min = min(df1), max = max(df1), value = c(min(df1),max(df1)))
        } else {
-         helpText("There is no scale bar for non-numerical variables.")
+         h5("No scale bar for nonnumerical variable")
        }
      } else {return()}
    })
