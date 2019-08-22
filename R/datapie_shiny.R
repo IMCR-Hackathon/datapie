@@ -998,7 +998,7 @@ datapie_shiny <- function( dataset = NA ) {
   #####################################
   
       output$out_table <- renderDataTable(
-        df_shiny()
+        df_shiny(), options = list(scrollX = TRUE)
       )
       
       output$summary_table <- renderDataTable(
