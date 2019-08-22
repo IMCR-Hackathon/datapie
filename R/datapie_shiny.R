@@ -164,7 +164,7 @@ datapie_shiny <- function( dataset = NA ) {
     ),
     
     ########Define Tabs#########
-    mainPanel(width = 7,
+    mainPanel(width = 6,
               tabsetPanel(
                 type = "tabs",
                 tabPanel("Data",
@@ -268,7 +268,7 @@ datapie_shiny <- function( dataset = NA ) {
     conditionalPanel(
       condition = "input.tabs=='Plot' || input.tabs=='Interactive Plot'",
       sidebarPanel(
-        width = 2,
+        width = 3,
         h4("Change aesthetics"),
         tabsetPanel(
           tabPanel(
@@ -998,7 +998,7 @@ datapie_shiny <- function( dataset = NA ) {
   #####################################
   
       output$out_table <- renderDataTable(
-        df_shiny(), options = list(scrollX = TRUE)
+        df_shiny()
       )
       
       output$summary_table <- renderDataTable(
