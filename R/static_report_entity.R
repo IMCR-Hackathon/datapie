@@ -8,9 +8,9 @@
 #' @return (list) A list containing entity-level report items.
 #'
 
-static_report_entity <- function(entity_df) {
+static_report_entity <- function(entity_list, entity_df) {
   list(
-    all = summarize_all_var(entity_df),
+    all = summarize_all_var(entity_list),
     numvars = summarize_numeric_var(entity_df),
     catvars = tryCatch({
       summarize_cat_var(entity_df)

@@ -18,7 +18,13 @@ static_report_complete <- function(entity_list, output_path, shiny = F) {
   
   # make entity-level report
   entity_df <- entity_list[["data"]]
-  entity_report <- static_report_entity(entity_df)
+  entity_report <- static_report_entity(entity_list, entity_df)
+  
+  if (ncol(entity_report[["all"]]) == 4) {
+    cols <- c("Variable", "Class", "No. Values", "No. NAs")
+  } else if (ncol(entity_report[["all"]]) == 5) {
+    cols <- c("Variable", "Definition", "Class", "No. Values", "No. NAs")
+  }
   
   # detect spatial information
   space <- space_detective(entity_list, report = T)
@@ -38,7 +44,8 @@ static_report_complete <- function(entity_list, output_path, shiny = F) {
       df = entity_df,
       space_msg = space_msg,
       entity_report = entity_report,
-      var_report = var_report
+      var_report = var_report,
+      cols = cols
       )
   
   # set template path
