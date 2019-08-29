@@ -42,9 +42,9 @@ classify_xy <- function(list, dim) {
       scale_cond <-
         grepl(scale_matches,
               c(attr_row[["measurementScale"]]), ignore.case = T)
-      unit_cond <-
+      unit_cond <- if ("unit" %in% names(attr_row)) {
         grepl(unit_matches, c(attr_row[["unit"]]), ignore.case = T)
-      
+      } else FALSE
       # ---
       # nested conditions
       
