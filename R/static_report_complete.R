@@ -3,12 +3,14 @@
 #'
 #' @param entity_list (list) A list containing information on a single data entity in metajam output format.
 #' @param output_path (character) Path to save complete HTML report to. If "ask", a Rstudio pop-up window appears allowing choice of save directory (requires RStudio >= 1.1.287).
+#' @param DOI (character) The data package DOI. If supplied, reports will include DOI for re-producibility.
+#' @param shiny (logical) Whether this function is called in the GUI environment. The only difference is GUI-embedded reports do not feature a floating table of contents. 
 #'
 #' @return A HTML file with complete report on the chosen data entity.
 #' 
 #' @export
 
-static_report_complete <- function(entity_list, output_path, shiny = F) {
+static_report_complete <- function(entity_list, output_path, DOI = NULL, shiny = F) {
   
   if ("summary_metadata" %in% names(entity_list)) {
   # append "File_Name" in summary metadata to report name
@@ -18,7 +20,7 @@ static_report_complete <- function(entity_list, output_path, shiny = F) {
   
   # make entity-level report
   entity_df <- entity_list[["data"]]
-  entity_report <- static_report_entity(entity_list, entity_df)
+  entity_report <- static_report_entity(entity_list = entity_list, entity_df = entity_df)
   
   if (ncol(entity_report[["all"]]) == 4) {
     cols <- c("Variable", "Class", "No. Values", "No. NAs")
@@ -45,7 +47,8 @@ static_report_complete <- function(entity_list, output_path, shiny = F) {
       space_msg = space_msg,
       entity_report = entity_report,
       var_report = var_report,
-      cols = cols
+      cols = cols,
+      DOI = DOI
       )
   
   # set template path

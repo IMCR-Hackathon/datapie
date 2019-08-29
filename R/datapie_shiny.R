@@ -645,6 +645,7 @@ datapie_shiny <- function( dataset = NA ) {
           report_filename <-
             try(static_report_complete(entity_list = entity_list,
                                        output_path = temp_output,
+                                       DOI = input$doi,
                                        shiny = T))
           }
           
