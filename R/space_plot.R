@@ -29,24 +29,51 @@ space_plot <-
         xbreak <- round(50 / (xrange + yrange) * xrange)
         ybreak <- round(50 / (xrange + yrange) * yrange)
         
+        # account for really narrow, transect-like study extents
+        
+        if (xbreak == 1) {
+          ybreak <- 20
+          agg_by <- list(lat = cut(y_col, breaks = ybreak)) 
+          
+        } else if (ybreak == 1) {
+          xbreak <- 20
+          agg_by <- list(lng = cut(x_col, breaks = xbreak))
+
+        } else {
+          agg_by <- list(
+            lat = cut(y_col, breaks = ybreak),
+            lng = cut(x_col, breaks = xbreak)
+          )
+        }
+        
         non_na <-
           aggregate(
             var,
-            by = list(
-              lat = cut(y_col, breaks = ybreak),
-              lng = cut(x_col, breaks = xbreak)
-            ),
+            by = agg_by,
             FUN = function(x) {
               sum(!is.na(x))
             }
           )
         
+        if (xbreak == 1){
+          non_na$lng <- as.factor(paste0("(", min(x_col, na.rm = T), ",", max(x_col, na.rm = T), "]"))
+        } 
+        if (ybreak == 1){
+          non_na$lat <- as.factor(paste0("(", min(y_col, na.rm = T), ",", max(y_col, na.rm = T), "]"))
+        }
+        
+        # if (xbreak == 1) {
+        #   plot_aes <- aes(y = as.factor(lat), fill = x)
+        # } else if (ybreak == 1) {
+        #   plot_aes <- aes(x = as.factor(lng), fill = x)
+        # } else {
+        #   plot_aes <- aes(x = as.factor(lng),  y = as.factor(lat), fill = x)
+        # }
+        
+        #return(non_na)
+        
         non_na_plot <-
-          ggplot(non_na, aes(
-            x = as.factor(lng),
-            y = as.factor(lat),
-            fill = x
-          )) +
+          ggplot(non_na, aes(x = as.factor(lng),  y = as.factor(lat), fill = x)) +
           geom_tile(colour = "white", size = 0.25) +
           scale_fill_gradient(low = "blue",
                               high = "red",
@@ -58,26 +85,31 @@ space_plot <-
               varname,
               "\" over the study area?"
             ),
-            x = "lon (binned)",
-            y = "lat (binned)"
+            if (xbreak > 1) x = "lon (binned)",
+            if (ybreak > 1) y = "lat (binned)"
           ) +
           guides(fill = guide_legend(paste0(
             "Count of non-NAs in \n variable \"", varname, "\""
           )))
         
+        #return(non_na_plot)
+        
         if (is.numeric(var)) {
           avg <-
             aggregate(
               var,
-              by = list(
-                lat = cut(y_col, breaks = ybreak),
-                lng = cut(x_col, breaks = xbreak)
-              ),
+              by = agg_by,
               FUN = function(x) {
                 mean(x, na.rm = T)
               }
             )
           
+          if (xbreak == 1){
+            avg$lng <- as.factor(paste0("(", min(x_col, na.rm = T), ",", max(x_col, na.rm = T), "]"))
+          } 
+          if (ybreak == 1){
+            avg$lat <- as.factor(paste0("(", min(y_col, na.rm = T), ",", max(y_col, na.rm = T), "]"))
+          }
           avg_plot <-
             ggplot(avg, aes(
               x = as.factor(lng),
@@ -108,14 +140,18 @@ space_plot <-
           prev <-
             aggregate(
               var,
-              by = list(
-                lat = cut(y_col, breaks = ybreak),
-                lng = cut(x_col, breaks = xbreak)
-              ),
+              by = agg_by,
               FUN = function(x) {
                 names(which.max(table(x)))
               }
             )
+          if (xbreak == 1){
+            prev$lng <- as.factor(paste0("(", min(x_col, na.rm = T), ",", max(x_col, na.rm = T), "]"))
+          } 
+          if (ybreak == 1){
+            prev$lat <- as.factor(paste0("(", min(y_col, na.rm = T), ",", max(y_col, na.rm = T), "]"))
+          }
+          
           
           prev_plot <-
             ggplot(prev, aes(
