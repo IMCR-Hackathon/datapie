@@ -11,7 +11,10 @@
 static_report_entity <- function(entity_list, entity_df) {
   list(
     all = summarize_all_var(entity_list),
-    numvars = summarize_numeric_var(entity_df),
+    numvars = tryCatch({summarize_numeric_var(entity_df)
+    }, error = function(cond) {
+        return(NULL)
+      }),
     catvars = tryCatch({
       summarize_cat_var(entity_df)
     }, error = function(cond) {
