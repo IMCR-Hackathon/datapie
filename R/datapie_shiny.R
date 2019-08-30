@@ -88,7 +88,7 @@ datapie_shiny <- function( dataset = NA ) {
                    conditionalPanel(
                      condition = "input.report_to_display == 'None selected'",
                      actionButton("generate_example_report", "Generate report"),
-                     p("Compile report for the currently select data object. The report might take some time to load."),
+                     htmlOutput("current_obj_text"),
                      hr()
                    ),
                    downloadButton("download_report", "Download current (HTML)")
@@ -576,11 +576,17 @@ datapie_shiny <- function( dataset = NA ) {
     # --------------------------------------------------------------------------
     
     ################################################
-    
     ####### REPORT GENERATION AND DOWNLOAD #########
-    
     ################################################
     
+    # get name of current data object for
+    
+    current_obj <- reactive({
+      if (input$data_input == 1) return("Sample data")
+      if (input$data_input == 2) return(input$repo_file)
+    })
+    
+    output$current_obj_text <- renderText({paste0("Click to compile report for the currently select data object: <b>", current_obj(), "</b>. The report might take some time to generate.")})
     
     get_report <- 
       
