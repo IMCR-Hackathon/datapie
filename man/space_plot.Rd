@@ -4,15 +4,17 @@
 \alias{space_plot}
 \title{the Space plot}
 \usage{
-space_plot(space_cols = space_cols, df, var)
+space_plot(entity_df, varname, space_cols = space_cols)
 }
 \arguments{
-\item{space_cols}{A character vector whose two elements are named "lat_col" and "lon_col". Outpur from \code{\link{space_detective}}}
+\item{entity_df}{(data.frame) A data.frame containing entity-level data. The "data" child element of an entity-level list object in metajam output format.}
 
-\item{var}{Name of variable to make data availability and summary. Remember to enclose in quotes.}
+\item{varname}{Name of variable to make data availability and summary. Remember to enclose in quotes.}
+
+\item{space_cols}{A character vector whose two elements are named "y_col" and "x_col". Outpur from \code{\link{space_detective}}}
 }
 \value{
-For all variables, function returns a data availability plot over the study area. For categorical column types, function returns an extra plot showing most prevalent level of that variable in each spatial grid cell over the study area. For numeric column types, function returns an extra plot showing mean of that variable in each spatial grid cell over the study area. Lat and lon are binned; there are 50 bins normalized to attempt to enforce equal scales along each dimension.
+For all variables, function returns a data availability plot over the study area. For categorical variables, function returns an extra plot showing most prevalent level of that variable in each spatial grid cell over the study area. For numeric variables, function returns an extra plot showing mean of that variable in each spatial grid cell over the study area. y_dim and lon are binned; there are 50 bins normalized to attempt to enforce equal scales along each dimension.
 }
 \description{
 Create variable specific spatial heatmaps to show data availability and data summary over the geographical study area.

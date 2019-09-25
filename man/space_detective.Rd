@@ -4,13 +4,15 @@
 \alias{space_detective}
 \title{the space detective}
 \usage{
-space_detective(list)
+space_detective(entity_list, report = F)
 }
 \arguments{
-\item{list}{Metajam output for a single data entity}
+\item{entity_list}{(list) Metajam output for a single data entity}
+
+\item{report}{(logical) Whether the function is used in the report-making environment. Defaults to FALSE.}
 }
 \value{
-A character vector whose two elements are named "lat_col" and "lon_col", indicating the names of columns containing lat and lon information respectively, or an error message if not detected or if we aren't equipped to deal with the number of hits we got.
+A character vector whose two elements are named "x_col" and "y_col", indicating the columns (as appears in data) containing spatial information in the x and y dimensions respectively, or an message if not detected or if we aren't equipped to deal with the number of hits we got. If report == T, will also output messages.
 }
 \description{
 Wrapper for \code{\link{classify_xy}}. Runs \code{\link{classify_xy}}, counts number of hits in each dimension, then decides what to depending on those two numbers.

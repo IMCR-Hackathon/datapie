@@ -4,7 +4,7 @@
 \alias{static_report_entity}
 \title{Generate entity-level report.}
 \usage{
-static_report_entity(entity_df)
+static_report_entity(entity_list, entity_df)
 }
 \arguments{
 \item{entity_df}{(data.frame) (data.frame) A data.frame containing entity-level data. The "data" child element of an entity-level list object in metajam output format.}
