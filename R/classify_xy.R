@@ -4,7 +4,7 @@
 #' @param list (list) A metajam list output for a single data entity.
 #' @param dim (character) "x" or "y", dimension to look for.
 #'
-#' @return A logical vector
+#' @return A logical vector classifying variables as TRUE, containing spatial information, or FALSE, not containing spatial information of the dimension specifed. Variables are in order as appear in data.
 #'
 
 classify_xy <- function(list, dim) {
@@ -42,14 +42,14 @@ classify_xy <- function(list, dim) {
       scale_cond <-
         grepl(scale_matches,
               c(attr_row[["measurementScale"]]), ignore.case = T)
-      unit_cond <-
+      unit_cond <- if ("unit" %in% names(attr_row)) {
         grepl(unit_matches, c(attr_row[["unit"]]), ignore.case = T)
-      
+      } else FALSE
       # ---
       # nested conditions
       
       if (scale_cond) {
-        if (name_cond) {
+        if (name_cond & def_cond) {
           if (unit_cond) {
             return(T)
           } else
@@ -61,6 +61,12 @@ classify_xy <- function(list, dim) {
     }
     xy_or_not <-
       apply(list[["attribute_metadata"]], 1, use_metadata)
+    
+    # match names and reorder
+    indices <- match_names_2(list)
+    
+    xy_or_not <- xy_or_not[indices]
+    
   } else {
     
     # only use data if metadata is not available

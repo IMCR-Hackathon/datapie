@@ -78,11 +78,21 @@ datapie_shiny <- function( dataset = NA ) {
                    ),
                  conditionalPanel(
                    condition = "input.tabs == 'Report'",
-                   h4("Summary tables and plots for the selected data table"),
-                   actionButton("generate_example_report", "Generate report"),
-                   helpText("The report might take some time to load and will continue even if you navigate away from this tab."),
-                   downloadButton("download_report", "Download report"),
-                   helpText("Report will download as an .html file.")
+                   h3("Overall and variable-wise summary tables and plots"),
+                
+                   p("List of reports successfully generated in this session:"),
+                   selectInput("report_to_display", "Select report to view:", 
+                               choices = "",
+                               selected = "None selected"),
+                   hr(),
+                   conditionalPanel(
+                     condition = "input.report_to_display == 'None selected'",
+                     actionButton("generate_example_report", "Generate report"),
+                     htmlOutput("current_obj_text"),
+                     hr()
+                   ),
+                   downloadButton("download_report", "Download current (HTML)")
+                 
                  ),
                  
                  conditionalPanel(
@@ -566,14 +576,22 @@ datapie_shiny <- function( dataset = NA ) {
       }
     })
     
+    # --------------------------------------------------------------------------
+    
     ################################################
-    ##### generate and show static report ##########
+    ####### REPORT GENERATION AND DOWNLOAD #########
     ################################################
     
+    # get name of current data object for
     
-    get_report <-
-      
-      # do all this once "generate report" is clicked
+    current_obj <- reactive({
+      if (input$data_input == 1) return("Sample data")
+      if (input$data_input == 2) return(input$repo_file)
+    })
+    
+    output$current_obj_text <- renderText({paste0("Click to compile report for the currently select data object: <b>", current_obj(), "</b>. The report might take some time to generate.")})
+    
+    get_report <- 
       
       eventReactive(input$generate_example_report, {
         
@@ -607,6 +625,7 @@ datapie_shiny <- function( dataset = NA ) {
                                                     },
                                                     contentType = "text/HTML")
           
+          
           # ---
           # return HTML output report
           return(includeHTML(file.path(temp_output, report_filename)))
@@ -635,6 +654,7 @@ datapie_shiny <- function( dataset = NA ) {
           report_filename <-
             try(static_report_complete(entity_list = entity_list,
                                        output_path = temp_output,
+                                       DOI = input$doi,
                                        shiny = T))
           }
           
@@ -646,6 +666,7 @@ datapie_shiny <- function( dataset = NA ) {
                                                       file.copy(file.path(temp_output, report_filename), file)
                                                     },
                                                     contentType = "text/HTML")
+          
           return(includeHTML(file.path(temp_output, report_filename)))
           }
           # ------
@@ -654,12 +675,62 @@ datapie_shiny <- function( dataset = NA ) {
         } else if (input$data_input == 3) {
           return("Sorry, we don't currently support report generation for user-uploaded data.")
         }
+        
+
       })
-    
+
     # render HTMl static report
     
     output$report_html <- renderUI({
+      if("None selected" == input$report_to_display){
       get_report()
+      } else {
+        output$download_report <- downloadHandler(filename = input$report_to_display,
+                                                  content <- function(file) {
+                                                    file.copy(file.path(tempdir(), "reports_output", input$report_to_display), file)
+                                                  },
+                                                  contentType = "text/HTML")
+        includeHTML(file.path(tempdir(), "reports_output", input$report_to_display))
+
+      }
+    })
+    
+    # observe report files present in tempdir
+    
+    has.new.files <- function() {
+      unique(list.files(file.path(tempdir(), "reports_output"), pattern = "*.html"))
+    }
+    get.files <- function() {
+      list.files(file.path(tempdir(), "reports_output"), pattern = "*.html")
+    }
+
+    # store as a reactive instead of output
+    my_files <- reactivePoll(10000, session, checkFunc=has.new.files, valueFunc=get.files)
+
+    # any time the reactive changes, update the selectInput
+    observeEvent(my_files(),ignoreInit = T,ignoreNULL = T, {
+      reports <- my_files()
+      updateSelectInput(
+        session,
+        "report_to_display",
+        choices = c("None selected", reports),
+        selected = 'None selected')
+    })
+    
+  
+    # observe report files present in tempdir
+    # An's initial solution, which didn't update when new reports are made
+
+    observe({
+      #Extract the file names
+      reports <- list.files(file.path(tempdir(), "reports_output"), pattern = "*.html")
+
+      #Use the file names to populate the dropdown list
+      updateSelectInput(
+        session,
+        "report_to_display",
+        choices = c("None selected", reports),
+        selected = 'None selected')
     })
     
   #####################################

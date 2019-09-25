@@ -13,7 +13,7 @@
 
 summarize_numeric_var<-function(entity_df)  {
   SummaryTable_Numeric <- entity_df %>% 
-    dplyr::select_if(is.numeric) %>%
+    dplyr::select_if(~ is.numeric(.)) %>%
     tidyr::gather(key="column_name", value='value') %>%
     dplyr::group_by(column_name) %>%
     dplyr::summarize(min=min(value, na.rm=TRUE),

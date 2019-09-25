@@ -12,7 +12,7 @@ classify_xy(list, dim)
 \item{dim}{(character) "x" or "y", dimension to look for.}
 }
 \value{
-A logical vector
+A logical vector classifying variables as TRUE, containing spatial information, or FALSE, not containing spatial information of the dimension specifed. Variables are in order as appear in data.
 }
 \description{
 Detect spatial information in data columns

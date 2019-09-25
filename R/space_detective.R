@@ -6,11 +6,13 @@
 #' @param entity_list (list) Metajam output for a single data entity
 #' @param report (logical) Whether the function is used in the report-making environment. Defaults to FALSE.
 #' 
-#' @return A character vector whose two elements are named "lat_col" and "lon_col", indicating the names of columns containing lat and lon information respectively, or an error message if not detected or if we aren't equipped to deal with the number of hits we got. If report == T, will also output messages.
+#' @return A character vector whose two elements are named "x_col" and "y_col", indicating the columns (as appears in data) containing spatial information in the x and y dimensions respectively, or an message if not detected or if we aren't equipped to deal with the number of hits we got. If report == T, will also output messages.
 #'
 #' @export
 
 space_detective <- function(entity_list, report = F) {
+  
+  # call to classify_xy
   x_detect <- classify_xy(entity_list, "x")
   y_detect <- classify_xy(entity_list, "y")
   
@@ -37,9 +39,13 @@ space_detective <- function(entity_list, report = F) {
     # single pair
     
     if (x_hits == 1 & y_hits == 1) {
+      
       # get target column names
-      x_col <- entity_list[["attribute_metadata"]][which(as.logical(x_detect)), "attributeName"]
-      y_col <- entity_list[["attribute_metadata"]][which(as.logical(y_detect)), "attributeName"]
+      # x_col <- entity_list[["attribute_metadata"]][which(as.logical(x_detect)), "attributeName"]
+      # y_col <- entity_list[["attribute_metadata"]][which(as.logical(y_detect)), "attributeName"]
+      
+      x_col <- colnames(entity_list[["data"]])[which(as.logical(x_detect))]
+      y_col <- colnames(entity_list[["data"]])[which(as.logical(y_detect))]
       
       msg <- paste("Space detective found a single pair of columns containing spatial information. \n Latitude column: ", y_col, "\n Longitude column: ", x_col, "\n")
       

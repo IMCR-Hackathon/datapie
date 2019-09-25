@@ -4,12 +4,16 @@
 \alias{static_report_complete}
 \title{Wrapper function to generate complete HTML report: entity-level  plus variable-level reports for one entity.}
 \usage{
-static_report_complete(entity_list, output_path, shiny = F)
+static_report_complete(entity_list, output_path, DOI = NULL, shiny = F)
 }
 \arguments{
 \item{entity_list}{(list) A list containing information on a single data entity in metajam output format.}
 
 \item{output_path}{(character) Path to save complete HTML report to. If "ask", a Rstudio pop-up window appears allowing choice of save directory (requires RStudio >= 1.1.287).}
+
+\item{DOI}{(character) The data package DOI. If supplied, reports will include DOI for re-producibility.}
+
+\item{shiny}{(logical) Whether this function is called in the GUI environment. The only difference is GUI-embedded reports do not feature a floating table of contents.}
 }
 \value{
 A HTML file with complete report on the chosen data entity.
