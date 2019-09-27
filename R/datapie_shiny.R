@@ -179,6 +179,7 @@ datapie_shiny <- function( dataset = NA ) {
                 type = "tabs",
                 tabPanel("Data",
                          dataTableOutput("out_table"),
+                         h3(textOutput("download_done_message")),
                          textOutput("message_text")),
                 tabPanel("Report", 
                          #dataTableOutput("summary_table"),
@@ -477,6 +478,10 @@ datapie_shiny <- function( dataset = NA ) {
     list_shiny <- eventReactive(input$fetch_button, {
       #Allow messages to be printed to the console
       withCallingHandlers({
+        
+        # empty out the "done" message box
+        output$download_done_message <- renderText({return("")})
+        
         #Initialize the package used to print messages
         shinyjs::html("message_text", "")
       #Read in data
@@ -520,6 +525,9 @@ datapie_shiny <- function( dataset = NA ) {
             html = paste(m$message, "<br>"),
             add = TRUE)
         })
+      
+      output$download_done_message <- renderText({return("Download and parsing is completed. Select a data object from the left menu to start. \n")})
+      
       data_list
     }
       )
