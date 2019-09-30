@@ -71,9 +71,10 @@ classify_xy <- function(list, dim) {
     
     # only use data if metadata is not available
     
-    data_only <- function (column) {
+    data_only <- function(colname) {
+      column <- list[["data"]][[colname]]
       name_cond <-
-        grepl(name_matches, colnames(column), ignore.case = T)
+        grepl(name_matches, colname, ignore.case = T)
       type_cond <- is.numeric(column)
       range_cond_x <- min(column) >= -180 & max(column) <= 180
       range_cond_y <- min(column) >= -90 & max(column) <= 90
@@ -92,7 +93,7 @@ classify_xy <- function(list, dim) {
         return(F)
       }
     }
-    xy_or_not <- apply(list[["data"]], 2, data_only)
+    xy_or_not <- lapply(colnames(list[["data"]]), data_only)
   }
   return(xy_or_not)
 }
