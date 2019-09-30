@@ -87,11 +87,31 @@ data_package_read <- function(data.pkg.path = NULL){
   
   pkg_dir_name <- list.dirs(data.pkg.path, recursive = FALSE)
   
-  # Read objects
+  file_names <- sub(".*/", "", pkg_dir_name) 
+  file_ext <- sub(".*__", "", file_names)
+  
+  csv <- grep("csv", file_ext)
+  
+  if (length(pkg_dir_name) - length(csv) > 0) {
+    message(paste0(
+      'Sorry ... "',
+      file_names[-csv],
+      '" is an unsupported file type and can not be read at this time.',
+      collapse = '<br>'
+    ))
+    pkg_dir_name <- pkg_dir_name[csv]
+  }
+  
+
+    # Read objects
   
   output <- lapply(
     pkg_dir_name,
-    metajam::read_d1_files
+    tryCatch(metajam::read_d1_files, 
+             error = function(e) {
+               attr(e, "problems") <- e
+               return(e)
+               })
   )
   
   # Use object names for the output list
@@ -106,7 +126,7 @@ data_package_read <- function(data.pkg.path = NULL){
       '.'
     )
   )
-  
+  return(output)
   # Remove unreadable objects (e.g. xlsx)
 
   fnames_out <- rep(NA_character_, length(output))
@@ -128,9 +148,9 @@ data_package_read <- function(data.pkg.path = NULL){
     fnames_out <- fnames_out[!is.na(fnames_out)]
     message(
       paste0(
-        'Sorry ... "',
+        'Sorry, parsing errors were encountered with "',
         fnames_out,
-        '" is an unsupported file type and can not be read at this time.',
+        '".',
         collapse = '<br>'
       )
     )
