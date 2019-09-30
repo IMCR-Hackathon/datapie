@@ -1,5 +1,7 @@
 Package: datapie
-Title: Data Package Interface (for) Evaluation
+Type: Package
+Title: Data Package Interface for Evaluation
+Description: Interactively explore the contents of a data package from the DataONE Network. Input the Digital Object Identifier (DOI) and get a variable-wise summary report and Shiny R Interface for basic plotting. This tool accelerates data reuse by enabling a deeper understanding than can be obtained from the metadata alone.
 Version: 0.0.0.9000
 Authors@R:
     c(
@@ -15,7 +17,6 @@ Authors@R:
     person(given='Kristin', family='Vanderbilt', email = 'krvander@fiu.edu', role = c('aut')),
     person(given='Jocelyn', family='Wardrup', email = 'jocie@udel.edu', role = c('aut'))
     )
-Description: Easily explore data by creating ggplots through a (shiny-)GUI. R-code to recreate graph provided.   
 Depends: R (>= 3.3.2)
 Imports:
     cowplot,
@@ -49,4 +50,4 @@ Suggests: testthat,
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-
+Language: en-US
