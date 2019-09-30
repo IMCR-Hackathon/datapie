@@ -659,16 +659,20 @@ datapie_shiny <- function( dataset = NA ) {
             
           entity_list <- list_shiny()[[input$repo_file]]
           
-          report_filename <-
-            try(static_report_complete(entity_list = entity_list,
+            tryCatch(static_report_complete(entity_list = entity_list,
                                        output_path = temp_output,
                                        DOI = input$doi,
-                                       shiny = T))
+                                       shiny = T),
+                     error = function(e) {
+                       report_error <- e
+                     })
           }
           
           # ---
           # handle download 
           
+          if (exists(report_error) && !is.null(report_error)) return(textOutput(report_error))
+          else {
           output$download_report <- downloadHandler(filename = report_filename,
                                                     content <- function(file) {
                                                       file.copy(file.path(temp_output, report_filename), file)
@@ -676,6 +680,7 @@ datapie_shiny <- function( dataset = NA ) {
                                                     contentType = "text/HTML")
           
           return(includeHTML(file.path(temp_output, report_filename)))
+          }
           }
           # ------
           # if using uploaded data, output message
@@ -690,8 +695,9 @@ datapie_shiny <- function( dataset = NA ) {
     # render HTMl static report
     
     output$report_html <- renderUI({
-      if("None selected" == input$report_to_display){
-      get_report()
+      
+      if ("None selected" == input$report_to_display){
+        get_report()
       } else {
         output$download_report <- downloadHandler(filename = input$report_to_display,
                                                   content <- function(file) {
