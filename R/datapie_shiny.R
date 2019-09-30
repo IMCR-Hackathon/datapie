@@ -163,7 +163,7 @@ datapie_shiny <- function( dataset = NA ) {
                  
                  conditionalPanel(
                    condition = "input.tabs == 'Help'",
-                   h4("Help me!")
+                   h4("Quick Start Guide")
                  ),
                  
                  conditionalPanel(
@@ -189,7 +189,8 @@ datapie_shiny <- function( dataset = NA ) {
                 tabPanel("Interactive Plot", plotlyOutput("out_plotly")),
                 tabPanel("Code", verbatimTextOutput("out_r_code")),
                 tabPanel("Help",
-                         p("This is place holder text")),
+                         shiny::includeMarkdown(
+                           system.file("/vignettes/quick_start_guide.Rmd", package = "datapie"))),
                 id = "tabs"
                          ),
               conditionalPanel(condition="$('html').hasClass('shiny-busy')",
