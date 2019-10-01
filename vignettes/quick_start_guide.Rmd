@@ -1,5 +1,6 @@
 ---
 title: "Quick start guide"
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
@@ -7,51 +8,110 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-`datapie` has 5 tabs ...
+_NOTE: Only tabular data (i.e. .csv, .tsv, delimited .txt files, and some .xlsx) are supported at this time. Loading a data package containing both supported and unsupported data types will allow access to only the supported data._
 
-### Data
+\  
+\  
+\  
+\  
 
-Load data:
+# Find a data package
 
-* __Use sample data__: Sample data is loaded when `datapie` opens.
-* __Fetch data from DOI__: The Digital Object Identifier (DOI) of any data package available in the [DataONE Search Portal](https://search.dataone.org/data). Only tabular data are currently supported. Enter the DOI, press `Fetch Data`, wait for it to load, then select the data object you'd like to explore. Click `Save Data` if you want to keep a copy.
-* __Upload data__: Load a file from your computer. (Coming soon!)
+Find a data package of interest from the [DataONE Network Search Portal](https://search.dataone.org/data) and copy the DOI.
 
-### Report
+\  
+\  
 
-Click `Generate report` for a summary of the selected data object. Larger data take longer to process than smaller data so plan your patience accordingly :). Click `Download current (HTML)` if you'd like to save a copy.
+```{r, message = FALSE, echo = FALSE, out.width = "800px"}
+knitr::include_graphics("search_dataone.png")
+```
 
-### Plot
+\  
+\  
 
-Create a static plot. The left and right pannels control variable selection and plotting parameters.
+```{r, message = FALSE, echo = FALSE, out.width = "800px"}
+knitr::include_graphics("copy_doi.png")
+```
 
-Left Pannel:
+\  
+\  
+\  
+\  
 
-* __Type of graph__: The type of graph to create.
-* __X-variable__: The X-axis variable to plot.
-* __X-coerce__: Coerce the X-variable to a different class. Useful if the assigned class is wrong.
-* __Y-variable__: The Y-axis variable to plot.
-* __Y-coerce__: Coerce the Y-variable to a different class. Useful if the assigned class is wrong.
-* __Group (or color)__: Group the selected variable(s) by another variable. Great for exploring relationships with other variables.
-* __Facet Row__: Row-wise faceting of data according to a categorical variable.
-* __Facet Column__: Column-wise faceting of data according to a categorical variable.
-* __X-range of interest__: Change the range of X-axis data to plot.
-* __Opacity__: Change the opacity of the data points. Good for distinguishing stacked data points.
-* __Show regression line__: Add regression line with options to select smoothing functions and display confidence intervals.
-* __Download .pdf__: Download a .pdf of the plot.
-* __Download .tiff__: Download a .tiff of the plot.
+# Load data and select object (Data tab)
 
-Right Pannel:
+\  
+\  
 
-* __Text__: Options to modify plot title, axis labels, font size, font type, and text rotation.
-* __Theme__: Control gridlines, axis appearance, and background.
-* __Legend__: Add a legend for categorical data.
-* __Size__: Adjust plot size as it appears on screen or in the downloadable file.
+```{r, message = FALSE, echo = FALSE, out.width = "800px"}
+knitr::include_graphics("load_data.png")
+```
 
-### Interactive Plot
+\  
+\  
 
-Same as the __Plot__ tab but with options to zoom, select, and compare data points.
+```{r, message = FALSE, echo = FALSE, out.width = "800px"}
+knitr::include_graphics("select_object.png")
+```
 
-### Code
+\  
+\  
+\  
+\  
 
-Displays the code for creating the graphs in the __Plot__ and __Interactive Plot__ tabs. Good for reproducing plots outside of the `datapie` interface.
+# Create summary report (Report tab)
+
+\  
+\  
+
+```{r, message = FALSE, echo = FALSE, out.width = "800px"}
+knitr::include_graphics("create_report.png")
+```
+
+\  
+\  
+
+```{r, message = FALSE, echo = FALSE, out.width = "800px"}
+knitr::include_graphics("sample_date.png")
+```
+
+\  
+\  
+\  
+\  
+
+# Plot (Plot and Interactive Plot tabs)
+
+\  
+\  
+
+```{r, message = FALSE, echo = FALSE, out.width = "800px"}
+knitr::include_graphics("plot.png")
+```
+
+\  
+\  
+\  
+\  
+
+# Export code (Code tab)
+
+\  
+\  
+
+```{r, message = FALSE, echo = FALSE, out.width = "800px"}
+knitr::include_graphics("code.png")
+```
+
+\  
+\  
+\  
+\  
+
+# Understand interface features (Help tab)
+\  
+\  
+
+```{r, message = FALSE, echo = FALSE, out.width = "800px"}
+knitr::include_graphics("help.png")
+```

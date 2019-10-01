@@ -190,7 +190,7 @@ datapie_shiny <- function( dataset = NA ) {
                 tabPanel("Code", verbatimTextOutput("out_r_code")),
                 tabPanel("Help",
                          shiny::includeMarkdown(
-                           system.file("/vignettes/quick_start_guide.Rmd", package = "datapie"))),
+                           system.file("/vignettes/help_tab.Rmd", package = "datapie"))),
                 id = "tabs"
                          ),
               conditionalPanel(condition="$('html').hasClass('shiny-busy')",
