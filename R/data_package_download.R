@@ -83,12 +83,22 @@ data_package_download <- function(data.pkg.doi, download.dir = NULL){
 
   # Download data package to download.dir
   
-  pkg_dir_name <- unlist(
-    metajam::download_d1_data_pkg(
-      meta_obj = data.pkg.doi,
-      path = download.dir
+  pkg_dir_name <- try(
+    unlist(
+      metajam::download_d1_data_pkg(
+        meta_obj = data.pkg.doi,
+        path = download.dir
+      )
     )
   )
+  
+  if (class(pkg_dir_name) == "try-error") {
+    message(
+      paste0("Sorry, datapie can't handle ", data.pkg.doi, " at this time.")
+    )
+    message("Done.")
+    stop()
+  }
   
   # Create parent directory for data packages downloaded to a user specified
   # directory. Otherwise the parent directory is the temporary directory 
