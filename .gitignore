@@ -8,3 +8,4 @@ ggplotgui.Rproj
 .Rproj.user
 .DS_Store
 inst/doc
+data_pkg
