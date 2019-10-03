@@ -15,7 +15,7 @@ Load data:
 
 * __Use sample data__: Sample data is loaded when `datapie` opens.
 * __Fetch data from DOI__: The Digital Object Identifier (DOI) of any data package available in the [DataONE Search Portal](https://search.dataone.org/data). Only tabular data are currently supported. Enter the DOI, press `Fetch Data`, wait for it to load, then select the data object you'd like to explore. Click `Save Data` if you want to keep a copy.
-* __Upload data__: Load a file from your computer. (Coming soon!)
+* __Upload data__: From a file on your computer. Only tabulary data are currently supported. Browse to a file, select the `File type` and `Delimiter`, and click the `Submit data file` button.
 
 ### Report
 

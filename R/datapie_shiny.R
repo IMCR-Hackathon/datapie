@@ -54,10 +54,10 @@ datapie_shiny <- function( dataset = NA ) {
                      ),
                    conditionalPanel(
                      condition = "input.data_input=='3'",
-                     h5("Upload file from your computer: "),
+                     h5("Upload data from your computer: "),
                      fileInput("upload", "", multiple = FALSE),
-                     selectInput("file_type", "Type of file:",
-                                 list("text (csv)" = "text",
+                     selectInput("file_type", "File type:",
+                                 list("text (delimited)" = "text",
                                       "Excel" = "Excel",
                                       "SPSS" = "SPSS",
                                       "Stata" = "Stata",
@@ -66,14 +66,14 @@ datapie_shiny <- function( dataset = NA ) {
                      conditionalPanel(
                        condition = "input.file_type=='text'",
                        selectInput("upload_delim", "Delimiter:",
-                                   list("Semicolon" = ";",
+                                   list("Comma" = ",",
                                         "Tab" = "\t",
-                                        "Comma" = ",",
+                                        "Semicolon" = ";",
                                         "Space" = " "),
                                    selected = "Semicolon")
                        ),
                      actionButton("submit_datafile_button",
-                                  "Submit datafile")
+                                  "Submit data file")
                      )
                    ),
                  conditionalPanel(
@@ -510,6 +510,7 @@ datapie_shiny <- function( dataset = NA ) {
     current_obj <- reactive({
       if (input$data_input == 1) return("Sample data")
       if (input$data_input == 2) return(input$repo_file)
+      if (input$data_input == 3) return("Input file")
     })
     
     output$current_obj_text <- renderText({paste0("Click to compile report for the currently select data object: <b>", current_obj(), "</b>. The report might take some time to generate.")})
@@ -596,7 +597,35 @@ datapie_shiny <- function( dataset = NA ) {
           # if using uploaded data, output message
           
         } else if (input$data_input == 3) {
+          
           return("Sorry, we don't currently support report generation for user-uploaded data.")
+          # report_filename <- paste0("report_", "uploaded_data", ".html")
+          # 
+          # # ---
+          # # check for existing report, otherwise call static_report_complete
+          # 
+          # if (!file.exists(file.path(temp_output, report_filename))) {
+          #   report_filename <-
+          #     static_report_complete(
+          #       entity_list = data,
+          #       output_path = temp_output,
+          #       shiny = T
+          #     )
+          # }
+          # 
+          # # ---
+          # # handle download
+          # output$download_report <- downloadHandler(filename = report_filename,
+          #                                           content <- function(file) {
+          #                                             file.copy(file.path(temp_output, report_filename), file)
+          #                                           },
+          #                                           contentType = "text/HTML")
+          # 
+          # 
+          # # ---
+          # # return HTML output report
+          # return(includeHTML(file.path(temp_output, report_filename)))
+          
         }
         
 
@@ -713,7 +742,7 @@ datapie_shiny <- function( dataset = NA ) {
           if (is.null(input$upload)) {
             return(data.frame(x = "Select your datafile"))
           } else if (input$submit_datafile_button == 0) {
-            return(data.frame(x = "Press 'submit datafile' button"))
+            return(data.frame(x = "Press 'submit data file' button"))
           } else {
             isolate({
               if (input$file_type == "text") {
@@ -755,6 +784,50 @@ datapie_shiny <- function( dataset = NA ) {
         return(data)
       })
   
+    ###########################################################
+    ####### CREATE GRAPH CODE FOR USER UPLOADED DATA ##########
+    ###########################################################
+    
+    string_upload_code <- reactive({
+      
+      file_in <- input$upload
+      
+      if (input$data_input == 3) {
+        
+        # Avoid error message while file is not uploaded yet
+        if (is.null(input$upload)) {
+        } else if (input$submit_datafile_button == 0) {
+        } else {
+          isolate({
+            if (input$file_type == "text") {
+              p <- paste0(
+                "readr::read_delim('", file_in$name, "', delim = '", input$upload_delim, "', ", "col_names = TRUE)"
+              )
+            } else if (input$file_type == "Excel") {
+              p <- paste0(
+                "readxl::read_excel(", file_in$name, ")"
+              )
+            } else if (input$file_type == "SPSS") {
+              p <- paste0(
+                "haven::read_sav(", file_in$name, ")"
+              )
+            } else if (input$file_type == "Stata") {
+              p <- paste0(
+                "haven::read_dta(", file_in$name, ")"
+              )
+            } else if (input$file_type == "SAS") {
+              p <- paste0(
+                "haven::read_sas(", file_in$name, ")"
+              )
+            }
+          })
+        }
+        
+      }
+      p
+      
+    })
+    
   #####################################
   ####### CREATE GRAPH-CODE ###########
   #####################################
@@ -1111,13 +1184,43 @@ datapie_shiny <- function( dataset = NA ) {
             ", units = 'cm')",
             sep = ""
           )
+        } else if (input$data_input == 3) {
+          
+          gg_code <- string_code()
+          gg_code <- str_replace_all(gg_code, "\\+ ", "+\n  ")
+          
+          upcode <- string_upload_code()
+          upcode <- str_replace_all(upcode, "\\+ ", "+\n  ")
+          
+          paste(
+            "## You can use the code below to make the 'Plot' tab figure.\n\n",
+            "# You will need the following package(s):\n",
+            "library(\"datapie\")\n",
+            "library(\"ggplot2\")\n\n",
+            
+            "# The code below will load your data:\n",
+            "# df <- ", upcode, "\n\n",
+            "# The code below will generate the 'Plot' tab figure:\n",
+            "graph <- ",
+            gg_code,
+            "\ngraph\n\n",
+            "# If you want the plot to be interactive,\n",
+            "# you need the following package(s):\n",
+            "library(\"plotly\")\n\n",
+            "# The code below will generate the 'Interactive Plot'\n",
+            "# tab figure:\n",
+            "ggplotly(graph)\n\n",
+            "# The code below will save your plot:\n",
+            "ggsave('my_graph.pdf', graph, width = ",
+            width_download(),
+            ", height = ",
+            height_download(),
+            ", units = 'cm')",
+            sep = ""
+          )
+          
         }
-        
-        # uploaded data r-code
-        else {
-          paste("We do not support code generation from uploaded\n",
-                "data at this time.")
-          }
+
         })
 
   #####################################

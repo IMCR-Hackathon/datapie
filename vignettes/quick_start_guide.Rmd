@@ -115,3 +115,25 @@ knitr::include_graphics("code.png")
 ```{r, message = FALSE, echo = FALSE, out.width = "800px"}
 knitr::include_graphics("help.png")
 ```
+
+\  
+\  
+\  
+\  
+
+# Load data from file (Data tab)
+
+You can also load data files from your computer!
+
+\  
+\  
+
+```{r, message = FALSE, echo = FALSE, out.width = "800px"}
+knitr::include_graphics("load_local.png")
+```
+
+\  
+\  
+\  
+\  
+
