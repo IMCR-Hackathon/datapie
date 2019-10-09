@@ -85,33 +85,32 @@ data_package_read <- function(data.pkg.path = NULL){
   # Get paths of each data object (a package may contain more than one data 
   # object and associated metadata stored within an associated directory).
   
-  pkg_dir_name <- list.dirs(data.pkg.path, recursive = FALSE)
+  pkg_dir_full_paths <- list.dirs(data.pkg.path, recursive = FALSE)
+  pkg_dir <- sub(".*/", "", pkg_dir_full_paths) 
+
   
-  file_names <- sub(".*/", "", pkg_dir_name) 
-  file_ext <- sub(".*__", "", file_names)
-  
-  csv <- grep("csv", file_ext)
-  
-  if (length(pkg_dir_name) - length(csv) > 0) {
+  if (length(pkg_dir_full_paths) - length(csv) > 0) {
     message(paste0(
       'Sorry ... "',
       file_names[-csv],
       '" is an unsupported file type and can not be read at this time.',
       collapse = '<br>'
     ))
-    pkg_dir_name <- pkg_dir_name[csv]
+    pkg_dir_full_paths <- pkg_dir_full_paths[csv]
   }
   
 
     # Read objects
   
   output <- lapply(
-    pkg_dir_name,
-    tryCatch(metajam::read_d1_files, 
+    pkg_dir_full_paths,
+    function(x) {
+      tryCatch(metajam::read_d1_files(x, fnc = "data.table::fread"), 
              error = function(e) {
                attr(e, "problems") <- e
                return(e)
                })
+    }
   )
   
   # Use object names for the output list
@@ -119,7 +118,7 @@ data_package_read <- function(data.pkg.path = NULL){
   names(output) <- paste0(
     stringr::str_replace(
       stringr::str_remove(
-        pkg_dir_name,
+        pkg_dir_full_paths,
         '^[:graph:]*/'
       ),
       '__',
@@ -160,3 +159,41 @@ data_package_read <- function(data.pkg.path = NULL){
   output
   
 }
+
+# ---
+#' Determine which read function to use on data
+#' @param pkg_dir_name (character) Character vector of full paths to directories containing data and metadata 
+#' 
+#' @return (character) Named character vector of recommended read functions whose index correspond to directory order as supplied. 
+#'
+
+guess_read_fnc <- function(pkg_dir_full_paths) {
+  file_ext <- sub(".*__", "", pkg_dir_full_paths)
+  pkg_dir <- sub(".*/", "", pkg_dir_full_paths)
+  
+  csv <- grep("csv", file_ext)
+  excel <- grep("xlsx|xls", file_ext)
+  
+  excel_files <-
+    sapply(list.files(pkg_dir_full_paths[excel], full.names = T), function(x)
+      grep("\\.xls", x, value = T))
+  excel_files <-
+    excel_files[sapply(excel_files, function(x)
+      length(x) > 0)]
+  
+  names(excel_files) <- pkg_dir[excel]
+  
+  no_sheets <-
+    sapply(excel_files, function(x)
+      length(readxl::excel_sheets(x)))
+
+  tsv <- grep("tsv", file_ext)
+  
+  read_fnc <- c()
+  
+  for (i in seq_along(pkg_dir_full_paths)) {
+    if file_ext[i] == "csv" {}
+  }
+  
+}
+
