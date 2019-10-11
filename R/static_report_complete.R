@@ -2,6 +2,7 @@
 #' Wrapper function to generate complete HTML report: entity-level  plus variable-level reports for one entity.
 #'
 #' @param entity_list (list) A list containing information on a single data entity in metajam output format.
+#' @param report_filename (character) Name to give the report file. Defaults to NULL, in which case the report will be named in this  pattern "report_(file name here).html" or "report_data.html" if summary data is not available.
 #' @param output_path (character) Path to save complete HTML report to. If "ask", a Rstudio pop-up window appears allowing choice of save directory (requires RStudio >= 1.1.287).
 #' @param DOI (character) The data package DOI. If supplied, reports will include DOI for re-producibility.
 #' @param shiny (logical) Whether this function is called in the GUI environment. The only difference is GUI-embedded reports do not feature a floating table of contents. 
@@ -10,14 +11,15 @@
 #' 
 #' @export
 
-static_report_complete <- function(entity_list, output_path, DOI = NULL, shiny = F) {
+static_report_complete <- function(entity_list, report_filename = NULL, output_path, DOI = NULL, shiny = F) {
   
+  if (is.null(report_filename)) {
   if ("summary_metadata" %in% names(entity_list)) {
   # append "File_Name" in summary metadata to report name
   report_filename <-
     paste0("report_", entity_list[["summary_metadata"]][1, 2], ".html")
   } else report_filename <- paste0("report_data.html")
-  
+  }
   # make entity-level report
   entity_df <- entity_list[["data"]]
   entity_report <- static_report_entity(entity_list = entity_list, entity_df = entity_df)
