@@ -61,6 +61,8 @@
 #' 
 #' }
 #' 
+#' @importFrom data.table fread
+#' @importFrom readxl read_excel
 
 data_package_read <- function(data.pkg.path = NULL){
   
@@ -85,33 +87,55 @@ data_package_read <- function(data.pkg.path = NULL){
   # Get paths of each data object (a package may contain more than one data 
   # object and associated metadata stored within an associated directory).
   
-  pkg_dir_name <- list.dirs(data.pkg.path, recursive = FALSE)
+  pkg_dir_full_paths <- list.dirs(data.pkg.path, recursive = FALSE)
   
-  # Read objects
+  # parse file extensions to get read function to use
+  read_fnc <- guess_read_fnc(pkg_dir_full_paths)
   
+  # remove objects where data format is not supported
+  will_read <- !grepl("not supported", read_fnc)
+  message(paste(names(read_fnc[!will_read]), read_fnc[!will_read], sep = " is ", collapse = "\n"))
+  pkg_dir_full_paths <- pkg_dir_full_paths[will_read]
+  read_fnc <- read_fnc[will_read]
+
+    # Read objects
   output <- lapply(
-    pkg_dir_name,
-    metajam::read_d1_files
+    seq_along(pkg_dir_full_paths),
+    function(i) {
+      tryCatch(metajam::read_d1_files(pkg_dir_full_paths[i], fnc = read_fnc[i]),
+             error = function(e) {
+               attr(e, "problems") <- e
+               return(e)
+               })
+    }
   )
+  
+  # since data.table::fread reads in blank cells in character columns as ""
+  # replace these with NAs
+  
+  for (i in seq_along(output)) {
+    if (read_fnc[i] == "data.table::fread") {
+     output[[i]][["data"]][output[[i]][["data"]] == ""] <- NA
+    }
+  }
   
   # Use object names for the output list
   
   names(output) <- paste0(
     stringr::str_replace(
       stringr::str_remove(
-        pkg_dir_name,
+        pkg_dir_full_paths,
         '^[:graph:]*/'
       ),
       '__',
       '.'
     )
   )
-  
   # Remove unreadable objects (e.g. xlsx)
 
   fnames_out <- rep(NA_character_, length(output))
   for (i in seq_along(output)){
-    if (!is.null(attr(output[[i]]$data, which = 'problems')) &
+    if (!is.null(attr(output[[i]]$data, which = 'problems')) &&
         (ncol(output[[i]]$data) == 1)){
       fnames_out[i] <- names(output)[i]
       output[[i]] <- NULL
@@ -128,9 +152,9 @@ data_package_read <- function(data.pkg.path = NULL){
     fnames_out <- fnames_out[!is.na(fnames_out)]
     message(
       paste0(
-        'Sorry ... "',
+        'Sorry, parsing errors were encountered with "',
         fnames_out,
-        '" is an unsupported file type and can not be read at this time.',
+        '".',
         collapse = '<br>'
       )
     )
@@ -140,3 +164,35 @@ data_package_read <- function(data.pkg.path = NULL){
   output
   
 }
+
+# ---
+#' Determine which read function to use on data
+#' @param pkg_dir_name (character) Character vector of full paths to directories containing data and metadata 
+#' 
+#' @return (character) Named character vector of recommended read functions. Indices correspond to directory order as supplied. Names are the directory names. 
+#' @importFrom readxl excel_sheets
+
+guess_read_fnc <- function(pkg_dir_full_paths) {
+  file_ext <- sub(".*__", "", pkg_dir_full_paths)
+  pkg_dir <- sub(".*/", "", pkg_dir_full_paths)
+  read_fnc <- c()
+  for (i in 1:length(pkg_dir_full_paths)) {
+    if (grepl("csv|tsv|txt|tab|xls", file_ext[i])) {
+      if (grepl("xls", file_ext[i])) {
+        actual_excel <-
+          list.files(pkg_dir_full_paths[i], full.names = T)[sapply(list.files(pkg_dir_full_paths[i]), function(x)
+            grepl("\\.xls", x))]
+        no_sheets <- length(readxl::excel_sheets(actual_excel))
+        if (no_sheets == 1)
+          read_fnc[i] <- "readxl::read_excel"
+        else
+          read_fnc[i] <- "not supported: Excel file has more than one sheet"
+      } else
+        read_fnc[i] <- "data.table::fread"
+    } else
+      read_fnc[i] <- "not supported: data not in delimited/Excel format"
+  }
+  names(read_fnc) <- pkg_dir
+  return(read_fnc)
+}
+
