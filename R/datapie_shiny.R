@@ -31,22 +31,24 @@ datapie_shiny <- function( dataset = NA ) {
                  conditionalPanel(
                    condition = "input.tabs=='Data'",
                    h4("Data loading options"),
+                   hr(),
                    radioButtons(
-                     "data_input", "",
+                     "data_input", NULL,
                      choices = list("Use sample data" = 1,
                                     "Fetch data from DOI" = 2,
                                     "Upload data" = 3), #, "Paste text file" = 4), 
                      selected = 1),
                    conditionalPanel(
                      condition = "input.data_input=='1'",
-                     helpText("Sample data is loaded. Scroll left to see additional columns.")
+                     helpText("Sample data is loaded.")
                      ),
                    conditionalPanel(
                      condition = "input.data_input=='2'",
-                     h5("Enter data package DOI:"),
-                     textInput(inputId = "doi", label = NULL, placeholder = "doi:10.18739/A2DP3X"),
+                     textInput(inputId = "doi", label = "Enter data package DOI:", placeholder = "doi:10.18739/A2DP3X"),
                      actionButton("fetch_button", "Fetch Data"),
                      shinyFiles::shinyDirButton("dir", "Save Data", "Upload"),
+                     p(),
+                     p(),
                      textOutput("text"),
                      selectInput("repo_file", "Select data object:", 
                                  choices = "",
@@ -54,10 +56,9 @@ datapie_shiny <- function( dataset = NA ) {
                      ),
                    conditionalPanel(
                      condition = "input.data_input=='3'",
-                     h5("Upload data from your computer: "),
-                     fileInput("upload", "", multiple = FALSE),
-                     selectInput("file_type", "File type:",
-                                 list("text (delimited)" = "text",
+                     fileInput("upload", "Upload file from your computer:", multiple = FALSE),
+                     selectInput("file_type", "Type of file:",
+                                 list("text (csv)" = "text",
                                       "Excel" = "Excel",
                                       "SPSS" = "SPSS",
                                       "Stata" = "Stata",
@@ -73,47 +74,49 @@ datapie_shiny <- function( dataset = NA ) {
                                    selected = "Semicolon")
                        ),
                      actionButton("submit_datafile_button",
-                                  "Submit data file")
+                                  "Submit File")
                      )
                    ),
                  conditionalPanel(
                    condition = "input.tabs == 'Report'",
-                   h3("Overall and variable-wise summary tables and plots"),
-                
-                   p("List of reports successfully generated in this session:"),
-                   selectInput("report_to_display", "Select report to view:", 
-                               choices = "",
-                               selected = "None selected"),
+                   h4("Summary report"),
                    hr(),
                    conditionalPanel(
-                     condition = "input.report_to_display == 'None selected'",
-                     actionButton("generate_example_report", "Generate report"),
                      htmlOutput("current_obj_text"),
-                     hr()
+                     p(),
+                     condition = "input.report_to_display == 'None selected'",
+                     actionButton("generate_example_report", "Create Report"),
+                     p()
                    ),
-                   downloadButton("download_report", "Download current (HTML)")
+                   selectInput("report_to_display", "Reports created in this session:", 
+                               choices = "",
+                               selected = "None selected"),
+                   p(),
+                   p(),
+                   downloadButton("download_report", "Download Report")
                  
                  ),
                  
                  conditionalPanel(
                    condition = "input.tabs=='Plot' || input.tabs=='Interactive Plot'",
-                   h4("Create visualization"),
+                   h4("Visualization"),
+                   hr(),
                    selectInput(inputId = "Type",
                                label = "Type of graph:",
                                choices = c("Boxplot", "Histogram", "Scatter"),
                                selected = "Histogram"),
-                   selectInput("x_var", "X-variable", choices = ""),
-                   selectInput("x_cast", "X-coerce", choices = c('default','character', 'numeric', 'date')),
+                   selectInput("x_var", "X-variable:", choices = ""),
+                   selectInput("x_cast", "X-coerce:", choices = c('default','character', 'numeric', 'date')),
                    conditionalPanel(condition = "input.Type!='Histogram'", # "input.Type!='Density' && input.Type!='Histogram'",
-                                    selectInput("y_var", "Y-variable", choices = ""),
-                                    selectInput("y_cast", "Y-coerce", choices = c('default', 'character', 'numeric', 'date'))
+                                    selectInput("y_var", "Y-variable:", choices = ""),
+                                    selectInput("y_cast", "Y-coerce:", choices = c('default', 'character', 'numeric', 'date'))
                    ),
                    conditionalPanel(condition = "input.Type =='Histogram'", # "input.Type!='Density' && input.Type!='Histogram'",
                                     helpText("There is no relevant Y-variable for histogram plots.")
                    ),
-                   selectInput("group", "Group (or color)", choices = ""),
-                   selectInput("facet_row", "Facet Row", choices = ""),
-                   selectInput("facet_col", "Facet Column", choices = ""),
+                   selectInput("group", "Group:", choices = ""),
+                   selectInput("facet_row", "Facet row:", choices = ""),
+                   selectInput("facet_col", "Facet column:", choices = ""),
                    
                    
                    uiOutput("data_range"),
@@ -146,24 +149,26 @@ datapie_shiny <- function( dataset = NA ) {
                                      value = FALSE)
                      )
                    ),
-                   downloadButton("download_plot_PDF",
-                                  "Download .pdf"),
-                   p(),
-                   downloadButton("download_plot_Tiff",
-                                  "Download .tiff"),
-                   helpText("Download plot as either a .pdf or .tiff file.")
+                   downloadButton("download_plot_PNG",
+                                  "Download plot")
+                   # p(),
+                   # downloadButton("download_plot_Tiff",
+                   #                "Download .tiff"),
+                   # helpText("Download plot as either a .pdf or .tiff file.")
                    
                  ),
                  
                  conditionalPanel(
                    condition = "input.tabs == 'Code'",
                    h4("R-Code"),
+                   hr(),
                    helpText("Use the code to the right to create the figures from the Plot and Interactive Plot tabs.")
                  ),
                  
                  conditionalPanel(
                    condition = "input.tabs == 'Help'",
-                   h4("Quick Start Guide")
+                   h4("Quick Start Guide"),
+                   hr()
                  ),
                  
                  conditionalPanel(
@@ -179,6 +184,7 @@ datapie_shiny <- function( dataset = NA ) {
                 type = "tabs",
                 tabPanel("Data",
                          dataTableOutput("out_table"),
+                         h3(textOutput("download_done_message")),
                          textOutput("message_text")),
                 tabPanel("Report", 
                          #dataTableOutput("summary_table"),
@@ -365,7 +371,7 @@ datapie_shiny <- function( dataset = NA ) {
               condition = "input.fig_size",
               numericInput("fig_height", "Plot height (# pixels): ",
                            value = 480),
-              numericInput("fig_width", "Plot width (# pixels):", value = 480)
+              numericInput("fig_width", "Plot width (# pixels):", value = 580)
             ),
             checkboxInput("fig_size_download",
                           strong("Adjust plot size for download"), FALSE),
@@ -400,6 +406,10 @@ datapie_shiny <- function( dataset = NA ) {
     list_shiny <- eventReactive(input$fetch_button, {
       #Allow messages to be printed to the console
       withCallingHandlers({
+        
+        # empty out the "done" message box
+        output$download_done_message <- renderText({return("")})
+        
         #Initialize the package used to print messages
         shinyjs::html("message_text", "")
       #Read in data
@@ -443,6 +453,9 @@ datapie_shiny <- function( dataset = NA ) {
             html = paste(m$message, "<br>"),
             add = TRUE)
         })
+      
+      output$download_done_message <- renderText({return("Download and parsing is completed. Select a data object from the left menu to start. \n")})
+      
       data_list
     }
       )
@@ -513,7 +526,7 @@ datapie_shiny <- function( dataset = NA ) {
       if (input$data_input == 3) return("Input file")
     })
     
-    output$current_obj_text <- renderText({paste0("Click to compile report for the currently select data object: <b>", current_obj(), "</b>. The report might take some time to generate.")})
+    output$current_obj_text <- renderText({paste0("Create report for the selected data object: <b>", current_obj(), "</b>. The report might take some time to generate.")})
     
     get_report <- 
       
@@ -575,16 +588,20 @@ datapie_shiny <- function( dataset = NA ) {
             
           entity_list <- list_shiny()[[input$repo_file]]
           
-          report_filename <-
-            try(static_report_complete(entity_list = entity_list,
+            tryCatch(static_report_complete(entity_list = entity_list,
                                        output_path = temp_output,
                                        DOI = input$doi,
-                                       shiny = T))
+                                       shiny = T),
+                     error = function(e) {
+                       report_error <- e
+                     })
           }
           
           # ---
           # handle download 
           
+          if (exists("report_error") && !is.null(report_error)) return(textOutput(report_error))
+          else {
           output$download_report <- downloadHandler(filename = report_filename,
                                                     content <- function(file) {
                                                       file.copy(file.path(temp_output, report_filename), file)
@@ -592,6 +609,7 @@ datapie_shiny <- function( dataset = NA ) {
                                                     contentType = "text/HTML")
           
           return(includeHTML(file.path(temp_output, report_filename)))
+          }
           }
           # ------
           # if using uploaded data, output message
@@ -634,8 +652,9 @@ datapie_shiny <- function( dataset = NA ) {
     # render HTMl static report
     
     output$report_html <- renderUI({
-      if("None selected" == input$report_to_display){
-      get_report()
+      
+      if ("None selected" == input$report_to_display){
+        get_report()
       } else {
         output$download_report <- downloadHandler(filename = input$report_to_display,
                                                   content <- function(file) {
@@ -1239,6 +1258,18 @@ datapie_shiny <- function( dataset = NA ) {
         },
         contentType = "application/pdf" # MIME type of the image
     )
+      output$download_plot_PNG <- downloadHandler(
+        filename <- function() {
+          paste("Figure_ggplotGUI_", Sys.time(), ".png", sep = "")
+        },
+        content <- function(file) {
+          df <- df_shiny()
+          p <- eval(parse(text = string_code()))
+          ggsave(file, p, width = width_download(),
+                 height = height_download(), units = "cm")
+        },
+        contentType = "application/png" # MIME type of the image
+      )
     output$download_plot_Tiff <- downloadHandler(
         filename <- function() {
           paste("Figure_ggplotGUI_", Sys.time(), ".tiff", sep = "")
