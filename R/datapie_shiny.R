@@ -612,41 +612,49 @@ datapie_shiny <- function( dataset = NA ) {
           }
           }
           # ------
-          # if using uploaded data, output message
+          # if using uploaded data
           
         } else if (input$data_input == 3) {
+          file_in <- input$upload
+          report_filename <-
+            paste0("report_", "uploaded_data_", file_in$name, ".html")
+          # mimic the list structure of metajam output
+          entity_list <- list(data = df_shiny())
           
-          return("Sorry, we don't currently support report generation for user-uploaded data.")
-          # report_filename <- paste0("report_", "uploaded_data", ".html")
-          # 
-          # # ---
-          # # check for existing report, otherwise call static_report_complete
-          # 
-          # if (!file.exists(file.path(temp_output, report_filename))) {
-          #   report_filename <-
-          #     static_report_complete(
-          #       entity_list = data,
-          #       output_path = temp_output,
-          #       shiny = T
-          #     )
-          # }
-          # 
-          # # ---
-          # # handle download
-          # output$download_report <- downloadHandler(filename = report_filename,
-          #                                           content <- function(file) {
-          #                                             file.copy(file.path(temp_output, report_filename), file)
-          #                                           },
-          #                                           contentType = "text/HTML")
-          # 
-          # 
-          # # ---
-          # # return HTML output report
-          # return(includeHTML(file.path(temp_output, report_filename)))
+          # ---
+          # check for existing report, otherwise call static_report_complete
           
+          if (!file.exists(file.path(temp_output, report_filename))) {
+            tryCatch(
+              static_report_complete(
+                entity_list = entity_list,
+                output_path = temp_output,
+                shiny = T,
+                report_filename = report_filename
+              ),
+              error = function(e) {
+                report_error <- e
+              }
+            )
+          }
+          
+          # ---
+          # handle download
+          if (exists("report_error") &&
+              !is.null(report_error))
+            return(textOutput(report_error))
+          else {
+            output$download_report <-
+              downloadHandler(filename = report_filename,
+                              content <-
+                                function(file) {
+                                  file.copy(file.path(temp_output, report_filename), file)
+                                },
+                              contentType = "text/HTML")
+            
+            return(includeHTML(file.path(temp_output, report_filename)))
+          }
         }
-        
-
       })
 
     # render HTMl static report
