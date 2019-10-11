@@ -671,7 +671,7 @@ datapie_shiny <- function( dataset = NA ) {
           # ---
           # handle download 
           
-          if (exists(report_error) && !is.null(report_error)) return(textOutput(report_error))
+          if (exists("report_error") && !is.null(report_error)) return(textOutput(report_error))
           else {
           output$download_report <- downloadHandler(filename = report_filename,
                                                     content <- function(file) {
