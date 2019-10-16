@@ -54,13 +54,7 @@ datapie_shiny <- function( dataset = NA ) {
           # Load data (example)
           conditionalPanel(
             condition = "input.data_input=='1'",
-            helpText("Sample data is loaded."),
-            selectInput(
-              "repo_file", 
-              "Select data object:", 
-              choices = "",
-              selected = "No object selected"
-            )
+            helpText("Sample data is loaded.")
           ),
           
           # Load data (DOI)
