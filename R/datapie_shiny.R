@@ -28,8 +28,7 @@ datapie_shiny <- function( dataset = NA ) {
     # Application title
     headerPanel("datapie"),
 
-    # Define Tabs -------------------------------------------------------------
-    
+    # Define Tabs
     mainPanel(
       width = 12,
       tabsetPanel(
@@ -40,8 +39,6 @@ datapie_shiny <- function( dataset = NA ) {
         tabPanel(
           
           "Data",
-          h4("Data loading options"),
-          hr(),
           
           radioButtons(
             "data_input", 
@@ -130,6 +127,7 @@ datapie_shiny <- function( dataset = NA ) {
             
           ),
           
+          hr(),
           dataTableOutput("out_table"),
           h3(textOutput("download_done_message")),
           textOutput("message_text")
@@ -140,6 +138,25 @@ datapie_shiny <- function( dataset = NA ) {
         
         tabPanel(
           "Report", 
+          p(),
+          conditionalPanel(
+            condition = "input.tabs == 'Report'",
+            conditionalPanel(
+              htmlOutput("current_obj_text"),
+              p(),
+              condition = "input.report_to_display == 'None selected'",
+              actionButton("generate_example_report", "Create Report"),
+              p()
+            ),
+            selectInput("report_to_display", "Reports created in this session:",
+                        choices = "",
+                        selected = "None selected"),
+            p(),
+            p(),
+            downloadButton("download_report", "Download Report"),
+            hr()
+            
+          ),
           htmlOutput("report_html")
         ),
         
@@ -147,14 +164,13 @@ datapie_shiny <- function( dataset = NA ) {
         
         tabPanel(
           "Plot",
-          plotOutput("out_ggplot"),
-          hr(),
+
           fluidRow(
             
-            # Column 1
+            # Column 1 ---------------------
             column(
-              3,
-              h4("Visualization"),
+              4,
+              p(),
               selectInput(
                 inputId = "Type",
                 label = "Type of graph:",
@@ -192,22 +208,6 @@ datapie_shiny <- function( dataset = NA ) {
                 condition = "input.Type =='Histogram'",
                 helpText("There is no relevant Y-variable for histogram plots.")
               ),
-              selectInput(
-                "group", 
-                "Group:", 
-                choices = ""
-              ),
-              selectInput(
-                "facet_row", 
-                "Facet row:", 
-                choices = ""
-              ),
-              selectInput(
-                "facet_col",
-                "Facet column:",
-                choices = ""
-              ),
-              uiOutput("data_range"),
               
               # Box plot
               conditionalPanel(
@@ -216,18 +216,6 @@ datapie_shiny <- function( dataset = NA ) {
                   inputId = "jitter",
                   label = strong("Show data points (jittered)"),
                   value = FALSE)
-              ),
-              
-              # Scatter or Histogram
-              conditionalPanel(
-                condition = "input.Type == 'Scatter' || input.Type == 'Histogram'",
-                sliderInput(
-                  "alpha", 
-                  "Opacity:", 
-                  min = 0, 
-                  max = 1, 
-                  value = 0.8
-                )
               ),
               
               # Scatter
@@ -256,20 +244,49 @@ datapie_shiny <- function( dataset = NA ) {
                     label = strong("Show confidence interval"),
                     value = FALSE)
                 )
-              ),
-              # Download
-              downloadButton(
-                "download_plot_PNG",
-                "Download plot"
               )
               
             ),
             
-            # Column 2
+            # Column 2 -----------------------
             column(
-              4, 
+              3,
+              p(),
+              selectInput(
+                "group", 
+                "Group:", 
+                choices = ""
+              ),
+              selectInput(
+                "facet_row", 
+                "Facet row:", 
+                choices = ""
+              ),
+              selectInput(
+                "facet_col",
+                "Facet column:",
+                choices = ""
+              ),
+              # Opacity
+              conditionalPanel(
+                condition = "input.Type == 'Scatter' || input.Type == 'Histogram'",
+                sliderInput(
+                  "alpha", 
+                  "Opacity:", 
+                  min = 0, 
+                  max = 1, 
+                  value = 0.8
+                )
+              ),
+              # X-range
+              uiOutput("data_range")
+            ),
+            
+            # Column 3 -----------------
+            column(
+              4,
               offset = 1,
-              h4("Change aesthetics"),
+              p(),
               # Text
               tabsetPanel(
                 
@@ -310,16 +327,16 @@ datapie_shiny <- function( dataset = NA ) {
                     value = FALSE
                   ),
                   conditionalPanel(
-                    condition = "input.adj_fnt_sz == true",
+                    condition = "input.adj_fnt_sz",
                     numericInput(
                       "fnt_sz_ttl",
                       "Size axis titles:",
-                      value = 12
+                      value = 16
                     ),
                     numericInput(
                       "fnt_sz_ax",
                       "Size axis labels:",
-                      value = 10
+                      value = 12
                     )
                   ),
                   # Rotate text
@@ -342,6 +359,11 @@ datapie_shiny <- function( dataset = NA ) {
                       choices = c("Courier", "Helvetica", "Times"),
                       selected = "Helvetica"
                     )
+                  ),
+                  # Download
+                  downloadButton(
+                    "download_plot_PNG",
+                    "Download plot"
                   )
                 ),
                 
@@ -365,17 +387,17 @@ datapie_shiny <- function( dataset = NA ) {
                           "Qualitative" = c("Accent", "Dark2", "Paired", 
                                             "Pastel1", "Pastel2", "Set1",
                                             "Set2", "Set3"
-                                          ),
+                          ),
                           "Diverging" = c("BrBG", "PiYG", "PRGn", "PuOr",
                                           "RdBu", "RdGy", "RdYlBu", "RdYlGn",
                                           "Spectral"
-                                        ),
+                          ),
                           "Sequential" = c("Blues", "BuGn", "BuPu", "GnBu",
                                            "Greens", "Greys", "Oranges", 
                                            "OrRd", "PuBu", "PuBuGn", "PuRd",
                                            "Purples", "RdPu", "Reds", "YlGn",
                                            "YlGnBu", "YlOrBr", "YlOrRd"
-                                          )
+                          )
                         ),
                         selected = "set1"
                       )
@@ -467,7 +489,7 @@ datapie_shiny <- function( dataset = NA ) {
                       label = NULL,
                       choices = c("Keep legend as it is", "Remove legend", 
                                   "Change legend"
-                                ),
+                      ),
                       selected = "Keep legend as it is"
                     ),
                     # Change legend
@@ -530,25 +552,10 @@ datapie_shiny <- function( dataset = NA ) {
                     )
                   )
                 )
-                
               )
-              
             ),
             
-            # Column 3
-            column(
-              4,
-              selectInput(
-                'facet_row',
-                'Facet Row', 
-                c(None='.', names(dataset))
-              ),
-              selectInput(
-                'facet_col',
-                'Facet Column',
-                c(None='.', names(dataset))
-              )
-            )
+            plotOutput("out_ggplot")
             
           )
           
@@ -558,6 +565,7 @@ datapie_shiny <- function( dataset = NA ) {
         
         tabPanel(
           "Interactive Plot", 
+          
           plotlyOutput("out_plotly")
         ),
         
@@ -565,10 +573,12 @@ datapie_shiny <- function( dataset = NA ) {
         
         tabPanel(
           "Code", 
+          p(),
           verbatimTextOutput("out_r_code")
         ),
         tabPanel(
           "Help",
+          p(),
           shiny::includeMarkdown(
             system.file("/vignettes/help_tab.Rmd", package = "datapie")
           )
