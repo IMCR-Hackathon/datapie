@@ -25,7 +25,10 @@ datapie_shiny <- function( dataset = NA ) {
     shinyjs::useShinyjs(),
     
     ###### Application title ########
-    headerPanel("datapie"),
+    headerPanel(fluidRow(
+      column(3, div(style = "font-weight: 700", "datapie")),
+      column(9, div(style = "font-size: 12pt; padding: 10px 0px", textOutput('current_obj_header')))
+    )),
     
     # conditionalPanel(condition = "$('html').hasClass('shiny-busy')",
     #                  tags$div("Loading...", id = "loadmessage")),
@@ -543,9 +546,11 @@ datapie_shiny <- function( dataset = NA ) {
     current_obj <- reactive({
       if (input$data_input == 1) return("Sample data")
       if (input$data_input == 2) return(input$repo_file)
+      if (input$data_input == 3) return("Uploaded data")
     })
     
     output$current_obj_text <- renderText({paste0("Create report for the selected data object: <b>", current_obj(), "</b>. The report might take some time to generate.")})
+    output$current_obj_header <- renderText({paste0("Current data object: ", current_obj())})
     
     get_report <- 
       
