@@ -18,377 +18,577 @@
 #' @export
 datapie_shiny <- function( dataset = NA ) {
   
-  ######### UI definition #############
+  # UI definition -------------------------------------------------------------
+  
   ui <- fluidPage(
-    #Allows app to print messages to the console
+    
+    # Allows app to print messages to the console
     shinyjs::useShinyjs(),
     
-    ###### Application title ########
+    # Application title
     headerPanel("datapie"),
+
+    # Define Tabs -------------------------------------------------------------
     
-    ###### Left panel: loading data and main graphing options ########
-    sidebarPanel(width = 3,
-                 conditionalPanel(
-                   condition = "input.tabs=='Data'",
-                   h4("Data loading options"),
-                   hr(),
-                   radioButtons(
-                     "data_input", NULL,
-                     choices = list("Use sample data" = 1,
-                                    "Fetch data from DOI" = 2,
-                                    "Upload data" = 3), #, "Paste text file" = 4), 
-                     selected = 1),
-                   conditionalPanel(
-                     condition = "input.data_input=='1'",
-                     helpText("Sample data is loaded.")
-                     ),
-                   conditionalPanel(
-                     condition = "input.data_input=='2'",
-                     textInput(inputId = "doi", label = "Enter data package DOI:", placeholder = "doi:10.18739/A2DP3X"),
-                     actionButton("fetch_button", "Fetch Data"),
-                     shinyFiles::shinyDirButton("dir", "Save Data", "Upload"),
-                     p(),
-                     p(),
-                     textOutput("text"),
-                     selectInput("repo_file", "Select data object:", 
-                                 choices = "",
-                                 selected = "No object selected")
-                     ),
-                   conditionalPanel(
-                     condition = "input.data_input=='3'",
-                     fileInput("upload", "Upload file from your computer:", multiple = FALSE),
-                     selectInput("file_type", "Type of file:",
-                                 list("text (csv)" = "text",
-                                      "Excel" = "Excel",
-                                      "SPSS" = "SPSS",
-                                      "Stata" = "Stata",
-                                      "SAS" = "SAS"),
-                                 selected = "text"),
-                     conditionalPanel(
-                       condition = "input.file_type=='text'",
-                       selectInput("upload_delim", "Delimiter:",
-                                   list("Comma" = ",",
-                                        "Tab" = "\t",
-                                        "Semicolon" = ";",
-                                        "Space" = " "),
-                                   selected = "Semicolon")
-                       ),
-                     actionButton("submit_datafile_button",
-                                  "Submit File")
-                     )
-                   ),
-                 conditionalPanel(
-                   condition = "input.tabs == 'Report'",
-                   h4("Summary report"),
-                   hr(),
-                   conditionalPanel(
-                     htmlOutput("current_obj_text"),
-                     p(),
-                     condition = "input.report_to_display == 'None selected'",
-                     actionButton("generate_example_report", "Create Report"),
-                     p()
-                   ),
-                   selectInput("report_to_display", "Reports created in this session:", 
-                               choices = "",
-                               selected = "None selected"),
-                   p(),
-                   p(),
-                   downloadButton("download_report", "Download Report")
-                 
-                 ),
-                 
-                 conditionalPanel(
-                   condition = "input.tabs=='Plot' || input.tabs=='Interactive Plot'",
-                   h4("Visualization"),
-                   hr(),
-                   selectInput(inputId = "Type",
-                               label = "Type of graph:",
-                               choices = c("Boxplot", "Histogram", "Scatter"),
-                               selected = "Histogram"),
-                   selectInput("x_var", "X-variable:", choices = ""),
-                   selectInput("x_cast", "X-coerce:", choices = c('default','character', 'numeric', 'date')),
-                   conditionalPanel(condition = "input.Type!='Histogram'", # "input.Type!='Density' && input.Type!='Histogram'",
-                                    selectInput("y_var", "Y-variable:", choices = ""),
-                                    selectInput("y_cast", "Y-coerce:", choices = c('default', 'character', 'numeric', 'date'))
-                   ),
-                   conditionalPanel(condition = "input.Type =='Histogram'", # "input.Type!='Density' && input.Type!='Histogram'",
-                                    helpText("There is no relevant Y-variable for histogram plots.")
-                   ),
-                   selectInput("group", "Group:", choices = ""),
-                   selectInput("facet_row", "Facet row:", choices = ""),
-                   selectInput("facet_col", "Facet column:", choices = ""),
-                   
-                   
-                   uiOutput("data_range"),
-                   #textOutput("text_output"),
-                   
-                   conditionalPanel(
-                     condition = "input.Type == 'Boxplot'", # "input.Type == 'Boxplot' || input.Type == 'Violin' || input.Type == 'Dot + Error'",
-                     checkboxInput(inputId = "jitter",
-                                   label = strong("Show data points (jittered)"),
-                                   value = FALSE)
-                   ),
-                   conditionalPanel(
-                     condition = "input.Type == 'Scatter' || input.Type == 'Histogram'", # "input.Type == 'Density' || input.Type == 'Histogram'",
-                     sliderInput("alpha", "Opacity:", min = 0, max = 1, value = 0.8)
-                   ),
-                   conditionalPanel(
-                     condition = "input.Type == 'Scatter'",
-                     checkboxInput(inputId = "line",
-                                   label = strong("Show regression line"),
-                                   value = FALSE),
-                     conditionalPanel(
-                       condition = "input.line == true",
-                       selectInput("smooth", "Smoothening function",
-                                   choices = c("lm", "loess", "gam"))
-                     ),
-                     conditionalPanel(
-                       condition = "input.line == true",
-                       checkboxInput(inputId = "se",
-                                     label = strong("Show confidence interval"),
-                                     value = FALSE)
-                     )
-                   ),
-                   downloadButton("download_plot_PNG",
-                                  "Download plot")
-                   # p(),
-                   # downloadButton("download_plot_Tiff",
-                   #                "Download .tiff"),
-                   # helpText("Download plot as either a .pdf or .tiff file.")
-                   
-                 ),
-                 
-                 conditionalPanel(
-                   condition = "input.tabs == 'Code'",
-                   h4("R-Code"),
-                   hr(),
-                   helpText("Use the code to the right to create the figures from the Plot and Interactive Plot tabs.")
-                 ),
-                 
-                 conditionalPanel(
-                   condition = "input.tabs == 'Help'",
-                   h4("Quick Start Guide"),
-                   hr()
-                 ),
-                 
-                 conditionalPanel(
-                   condition = "input.tabs == 'About'",
-                   h4("About datapie"),
-                   helpText("A litte metadata about datapie.")
-                 )
-    ),
-    
-    ########Define Tabs#########
-    mainPanel(width = 6,
-              tabsetPanel(
-                type = "tabs",
-                tabPanel("Data",
-                         dataTableOutput("out_table"),
-                         h3(textOutput("download_done_message")),
-                         textOutput("message_text")),
-                tabPanel("Report", 
-                         #dataTableOutput("summary_table"),
-                         htmlOutput("report_html")
+    mainPanel(
+      width = 12,
+      tabsetPanel(
+        type = "tabs",
+        
+        # Data Tab ------------------------------------------------------------
+        
+        tabPanel(
+          
+          "Data",
+          h4("Data loading options"),
+          hr(),
+          
+          radioButtons(
+            "data_input", 
+            NULL,
+            choices = list(
+              "Use sample data" = 1,
+              "Fetch data from DOI" = 2,
+              "Upload data" = 3
+            ),
+            selected = 1
+          ),
+          
+          # Load data (example)
+          conditionalPanel(
+            condition = "input.data_input=='1'",
+            helpText("Sample data is loaded."),
+            selectInput(
+              "repo_file", 
+              "Select data object:", 
+              choices = "",
+              selected = "No object selected"
+            )
+          ),
+          
+          # Load data (DOI)
+          conditionalPanel(
+            condition = "input.data_input=='2'",
+            textInput(
+              inputId = "doi", 
+              label = "Enter data package DOI:", 
+              placeholder = "doi:10.18739/A2DP3X"
+            ),
+            actionButton("fetch_button", "Fetch Data"),
+            shinyFiles::shinyDirButton("dir", "Save Data", "Upload"),
+            p(),
+            p(),
+            textOutput("text"),
+            selectInput(
+              "repo_file", 
+              "Select data object:", 
+              choices = "",
+              selected = "No object selected"
+            )
+          ),
+          
+          # Load data (local file)
+          conditionalPanel(
+            condition = "input.data_input=='3'",
+            fileInput(
+              "upload", 
+              "Upload file from your computer:", 
+              multiple = FALSE
+            ),
+            selectInput(
+              "file_type", 
+              "Type of file:",
+              list(
+                "text (csv)" = "text",
+                "Excel" = "Excel",
+                "SPSS" = "SPSS",
+                "Stata" = "Stata",
+                "SAS" = "SAS"
+              ),
+              selected = "text"
+            ),
+            
+            conditionalPanel(
+              condition = "input.file_type=='text'",
+              selectInput(
+                "upload_delim", 
+                "Delimiter:",
+                list(
+                  "Comma" = ",",
+                  "Tab" = "\t",
+                  "Semicolon" = ";",
+                  "Space" = " "
                 ),
-                tabPanel("Plot",
-                         mainPanel(plotOutput("out_ggplot"))),
-                tabPanel("Interactive Plot", plotlyOutput("out_plotly")),
-                tabPanel("Code", verbatimTextOutput("out_r_code")),
-                tabPanel("Help",
-                         shiny::includeMarkdown(
-                           system.file("/vignettes/help_tab.Rmd", package = "datapie"))),
-                id = "tabs"
-                         ),
-              conditionalPanel(condition="$('html').hasClass('shiny-busy')",
-                               tags$div("Loading...",id="loadmessage"))
-                         ), #close mainPanel
-    
-    ####### Right Panel ########
-    conditionalPanel(
-      condition = "input.tabs=='Plot' || input.tabs=='Interactive Plot'",
-      sidebarPanel(
-        width = 3,
-        h4("Change aesthetics"),
-        tabsetPanel(
-          tabPanel(
-            "Text",
-            checkboxInput(inputId = "label_axes",
-                          label = strong("Change labels axes"),
-                          value = FALSE),
-            conditionalPanel(
-              condition = "input.label_axes == true",
-              textInput("lab_x", "X-axis:", value = "label x-axis")
-            ),
-            conditionalPanel(
-              condition = "input.label_axes == true",
-              textInput("lab_y", "Y-axis:", value = "label y-axis")
-            ),
-            checkboxInput(inputId = "add_title",
-                          label = strong("Add title"),
-                          value = FALSE),
-            conditionalPanel(
-              condition = "input.add_title == true",
-              textInput("title", "Title:", value = "Title")
-            ),
-            checkboxInput(inputId = "adj_fnt_sz",
-                          label = strong("Change font size"),
-                          value = FALSE),
-            conditionalPanel(
-              condition = "input.adj_fnt_sz == true",
-              numericInput("fnt_sz_ttl",
-                           "Size axis titles:",
-                           value = 12),
-              numericInput("fnt_sz_ax",
-                           "Size axis labels:",
-                           value = 10)
-            ),
-            checkboxInput(inputId = "rot_txt",
-                          label = strong("Rotate text x-axis"),
-                          value = FALSE),
-            checkboxInput(inputId = "adj_fnt",
-                          label = strong("Change font"),
-                          value = FALSE),
-            conditionalPanel(
-              condition = "input.adj_fnt == true",
-              selectInput("font", "Font",
-                          choices = c("Courier",
-                                      "Helvetica",
-                                      "Times"),
-                          selected = "Helvetica")
-            )
-          ),
-          tabPanel(
-            "Theme",
-            conditionalPanel(
-              condition = "input.group != '.'",
-              checkboxInput(inputId = "adj_col",
-                            label = strong("Change colors"),
-                            value = FALSE),
-              conditionalPanel(
-                condition = "input.adj_col",
-                selectInput(inputId = "palet",
-                            label = strong("Select palette"),
-                            choices = list(
-                              "Qualitative" = c("Accent",
-                                                "Dark2",
-                                                "Paired",
-                                                "Pastel1",
-                                                "Pastel2",
-                                                "Set1",
-                                                "Set2",
-                                                "Set3"),
-                              "Diverging" = c("BrBG",
-                                              "PiYG",
-                                              "PRGn",
-                                              "PuOr",
-                                              "RdBu",
-                                              "RdGy",
-                                              "RdYlBu",
-                                              "RdYlGn",
-                                              "Spectral"),
-                              "Sequential" = c("Blues",
-                                               "BuGn",
-                                               "BuPu",
-                                               "GnBu",
-                                               "Greens",
-                                               "Greys",
-                                               "Oranges",
-                                               "OrRd",
-                                               "PuBu",
-                                               "PuBuGn",
-                                               "PuRd",
-                                               "Purples",
-                                               "RdPu",
-                                               "Reds",
-                                               "YlGn",
-                                               "YlGnBu",
-                                               "YlOrBr",
-                                               "YlOrRd")),
-                            selected = "set1")
+                selected = "Semicolon"
               )
             ),
-            conditionalPanel(
-              condition = "input.jitter",
-              checkboxInput("adj_jitter",
-                            strong("Change look jitter"), FALSE),
-              conditionalPanel(
-                condition = "input.adj_jitter",
-                textInput("col_jitter", "Colour (name or RGB):",
-                          value = "black"),
-                numericInput("size_jitter", "Size:", value = 2),
-                sliderInput("opac_jitter", "Opacity:",
-                            min = 0, max = 1, value = 0.5, step = 0.01),
-                sliderInput("width_jitter", "Width jitter:",
-                            min = 0, max = 0.5, value = 0.25, step = 0.01)
-              )
-            ),
-            checkboxInput("adj_grd",
-                          strong("Remove gridlines"), FALSE),
-            conditionalPanel(
-              condition = "input.adj_grd",
-              checkboxInput("grd_maj",
-                            strong("Remove major gridlines"), FALSE),
-              checkboxInput("grd_min",
-                            strong("Remove minor gridlines"), FALSE)
-            ),
-            selectInput("theme", "Theme",
-                        choices = c("bw" = "theme_bw()",
-                                    "classic" = "theme_classic()",
-                                    "dark" = "theme_dark()",
-                                    "grey" = "theme_grey()",
-                                    "light" = "theme_light()",
-                                    "line_draw" = "theme_linedraw()",
-                                    "minimal" = "theme_minimal()"),
-                        selected = "theme_bw()")
+            
+            actionButton(
+              "submit_datafile_button",
+              "Submit File"
+            )
+            
           ),
-          tabPanel(
-            "Legend",
-            conditionalPanel(
-              condition = "input.group != '.'",
-              radioButtons(inputId = "adj_leg",
-                           label = NULL,
-                           choices = c("Keep legend as it is",
-                                       "Remove legend",
-                                       "Change legend"),
-                           selected = "Keep legend as it is"),
+          
+          dataTableOutput("out_table"),
+          h3(textOutput("download_done_message")),
+          textOutput("message_text")
+          
+        ),
+        
+        # Report Tab ----------------------------------------------------------
+        
+        tabPanel(
+          "Report", 
+          htmlOutput("report_html")
+        ),
+        
+        # Plot Tab ------------------------------------------------------------
+        
+        tabPanel(
+          "Plot",
+          plotOutput("out_ggplot"),
+          hr(),
+          fluidRow(
+            
+            # Column 1
+            column(
+              3,
+              h4("Visualization"),
+              selectInput(
+                inputId = "Type",
+                label = "Type of graph:",
+                choices = c("Boxplot", "Histogram", "Scatter"),
+                selected = "Histogram"
+              ),
+              # X-var
+              selectInput(
+                "x_var", 
+                "X-variable:", 
+                choices = ""
+              ),
+              # X-coercion
+              selectInput(
+                "x_cast", 
+                "X-coerce:", 
+                choices = c('default','character', 'numeric', 'date')
+              ),
+              
+              # Histogram
               conditionalPanel(
-                condition = "input.adj_leg=='Change legend'",
-                textInput("leg_ttl", "Title legend:",
-                          value = "title legend"),
-                selectInput("pos_leg", "Position legend",
-                            choices = c("right",
-                                        "left",
-                                        "top",
-                                        "bottom"))
+                condition = "input.Type!='Histogram'",
+                selectInput(
+                  "y_var", 
+                  "Y-variable:", 
+                  choices = ""
+                ),
+                selectInput(
+                  "y_cast",
+                  "Y-coerce:",
+                  choices = c('default', 'character', 'numeric', 'date')
+                )
+              ),
+              conditionalPanel(
+                condition = "input.Type =='Histogram'",
+                helpText("There is no relevant Y-variable for histogram plots.")
+              ),
+              selectInput(
+                "group", 
+                "Group:", 
+                choices = ""
+              ),
+              selectInput(
+                "facet_row", 
+                "Facet row:", 
+                choices = ""
+              ),
+              selectInput(
+                "facet_col",
+                "Facet column:",
+                choices = ""
+              ),
+              uiOutput("data_range"),
+              
+              # Box plot
+              conditionalPanel(
+                condition = "input.Type == 'Boxplot'",
+                checkboxInput(
+                  inputId = "jitter",
+                  label = strong("Show data points (jittered)"),
+                  value = FALSE)
+              ),
+              
+              # Scatter or Histogram
+              conditionalPanel(
+                condition = "input.Type == 'Scatter' || input.Type == 'Histogram'",
+                sliderInput(
+                  "alpha", 
+                  "Opacity:", 
+                  min = 0, 
+                  max = 1, 
+                  value = 0.8
+                )
+              ),
+              
+              # Scatter
+              conditionalPanel(
+                condition = "input.Type == 'Scatter'",
+                # Regression line
+                checkboxInput(
+                  inputId = "line",
+                  label = strong("Show regression line"),
+                  value = FALSE
+                ),
+                # Smoothing options
+                conditionalPanel(
+                  condition = "input.line == true",
+                  selectInput(
+                    "smooth", 
+                    "Smoothening function",
+                    choices = c("lm", "loess", "gam")
+                  )
+                ),
+                # Confidence interval
+                conditionalPanel(
+                  condition = "input.line == true",
+                  checkboxInput(
+                    inputId = "se",
+                    label = strong("Show confidence interval"),
+                    value = FALSE)
+                )
+              ),
+              # Download
+              downloadButton(
+                "download_plot_PNG",
+                "Download plot"
+              )
+              
+            ),
+            
+            # Column 2
+            column(
+              4, 
+              offset = 1,
+              h4("Change aesthetics"),
+              # Text
+              tabsetPanel(
+                
+                tabPanel(
+                  "Text",
+                  # Axes labels
+                  checkboxInput(
+                    inputId = "label_axes",
+                    label = strong("Change labels axes"),
+                    value = FALSE
+                  ),
+                  conditionalPanel(
+                    condition = "input.label_axes == true",
+                    textInput("lab_x", "X-axis:", value = "label x-axis")
+                  ),
+                  conditionalPanel(
+                    condition = "input.label_axes == true",
+                    textInput(
+                      "lab_y", 
+                      "Y-axis:", 
+                      value = "label y-axis"
+                    )
+                  ),
+                  # Title
+                  checkboxInput(
+                    inputId = "add_title",
+                    label = strong("Add title"),
+                    value = FALSE
+                  ),
+                  conditionalPanel(
+                    condition = "input.add_title == true",
+                    textInput("title", "Title:", value = "Title")
+                  ),
+                  # Font size
+                  checkboxInput(
+                    inputId = "adj_fnt_sz",
+                    label = strong("Change font size"),
+                    value = FALSE
+                  ),
+                  conditionalPanel(
+                    condition = "input.adj_fnt_sz == true",
+                    numericInput(
+                      "fnt_sz_ttl",
+                      "Size axis titles:",
+                      value = 12
+                    ),
+                    numericInput(
+                      "fnt_sz_ax",
+                      "Size axis labels:",
+                      value = 10
+                    )
+                  ),
+                  # Rotate text
+                  checkboxInput(
+                    inputId = "rot_txt",
+                    label = strong("Rotate text x-axis"),
+                    value = FALSE
+                  ),
+                  # Font
+                  checkboxInput(
+                    inputId = "adj_fnt",
+                    label = strong("Change font"),
+                    value = FALSE
+                  ),
+                  conditionalPanel(
+                    condition = "input.adj_fnt == true",
+                    selectInput(
+                      "font", 
+                      "Font",
+                      choices = c("Courier", "Helvetica", "Times"),
+                      selected = "Helvetica"
+                    )
+                  )
+                ),
+                
+                # Theme -------------------------------------------------------
+                
+                tabPanel(
+                  "Theme",
+                  conditionalPanel(
+                    condition = "input.group != '.'",
+                    checkboxInput(
+                      inputId = "adj_col",
+                      label = strong("Change colors"),
+                      value = FALSE
+                    ),
+                    conditionalPanel(
+                      condition = "input.adj_col",
+                      selectInput(
+                        inputId = "palet",
+                        label = strong("Select palette"),
+                        choices = list(
+                          "Qualitative" = c("Accent", "Dark2", "Paired", 
+                                            "Pastel1", "Pastel2", "Set1",
+                                            "Set2", "Set3"
+                                          ),
+                          "Diverging" = c("BrBG", "PiYG", "PRGn", "PuOr",
+                                          "RdBu", "RdGy", "RdYlBu", "RdYlGn",
+                                          "Spectral"
+                                        ),
+                          "Sequential" = c("Blues", "BuGn", "BuPu", "GnBu",
+                                           "Greens", "Greys", "Oranges", 
+                                           "OrRd", "PuBu", "PuBuGn", "PuRd",
+                                           "Purples", "RdPu", "Reds", "YlGn",
+                                           "YlGnBu", "YlOrBr", "YlOrRd"
+                                          )
+                        ),
+                        selected = "set1"
+                      )
+                    )
+                  ),
+                  
+                  # Jitter ----------------------------------------------------
+                  
+                  conditionalPanel(
+                    condition = "input.jitter",
+                    checkboxInput(
+                      "adj_jitter",
+                      strong("Change look jitter"), 
+                      FALSE
+                    ),
+                    conditionalPanel(
+                      condition = "input.adj_jitter",
+                      textInput(
+                        "col_jitter", 
+                        "Colour (name or RGB):",
+                        value = "black"
+                      ),
+                      numericInput(
+                        "size_jitter", 
+                        "Size:", 
+                        value = 2
+                      ),
+                      sliderInput(
+                        "opac_jitter",
+                        "Opacity:",
+                        min = 0, 
+                        max = 1, 
+                        value = 0.5, 
+                        step = 0.01
+                      ),
+                      sliderInput(
+                        "width_jitter", 
+                        "Width jitter:",
+                        min = 0, 
+                        max = 0.5, 
+                        value = 0.25, 
+                        step = 0.01
+                      )
+                    )
+                  ),
+                  
+                  # Grid ------------------------------------------------------
+                  
+                  checkboxInput(
+                    "adj_grd",
+                    strong("Remove gridlines"), 
+                    FALSE
+                  ),
+                  conditionalPanel(
+                    condition = "input.adj_grd",
+                    checkboxInput(
+                      "grd_maj",
+                      strong("Remove major gridlines"), 
+                      FALSE
+                    ),
+                    checkboxInput(
+                      "grd_min",
+                      strong("Remove minor gridlines"), 
+                      FALSE
+                    )
+                  ),
+                  selectInput(
+                    "theme",
+                    "Theme",
+                    choices = c(
+                      "bw" = "theme_bw()", "classic" = "theme_classic()",
+                      "dark" = "theme_dark()", "grey" = "theme_grey()",
+                      "light" = "theme_light()", 
+                      "line_draw" = "theme_linedraw()",
+                      "minimal" = "theme_minimal()"
+                    ),
+                    selected = "theme_bw()"
+                  )
+                ),
+                
+                # Legend ------------------------------------------------------
+                
+                tabPanel(
+                  "Legend",
+                  conditionalPanel(
+                    condition = "input.group != '.'",
+                    radioButtons(
+                      inputId = "adj_leg",
+                      label = NULL,
+                      choices = c("Keep legend as it is", "Remove legend", 
+                                  "Change legend"
+                                ),
+                      selected = "Keep legend as it is"
+                    ),
+                    # Change legend
+                    conditionalPanel(
+                      condition = "input.adj_leg=='Change legend'",
+                      # Title
+                      textInput(
+                        "leg_ttl",
+                        "Title legend:",
+                        value = "title legend"
+                      ),
+                      # Position
+                      selectInput(
+                        "pos_leg", 
+                        "Position legend",
+                        choices = c("right", "left", "top", "bottom")
+                      )
+                    )
+                  )
+                ),
+                
+                # Figure size -------------------------------------------------
+                
+                tabPanel(
+                  "Size",
+                  checkboxInput(
+                    "fig_size",
+                    strong("Adjust plot size on screen"), 
+                    FALSE
+                  ),
+                  conditionalPanel(
+                    condition = "input.fig_size",
+                    numericInput(
+                      "fig_height",
+                      "Plot height (# pixels): ",
+                      value = 600
+                    ),
+                    numericInput(
+                      "fig_width", 
+                      "Plot width (# pixels):", 
+                      value = 1200
+                    )
+                  ),
+                  checkboxInput(
+                    "fig_size_download",
+                    strong("Adjust plot size for download"), 
+                    FALSE
+                  ),
+                  conditionalPanel(
+                    condition = "input.fig_size_download",
+                    numericInput(
+                      "fig_height_download",
+                      "Plot height (in cm):", 
+                      value = 14
+                    ),
+                    numericInput(
+                      "fig_width_download",
+                      "Plot width (in cm):", 
+                      value = 14
+                    )
+                  )
+                )
+                
+              )
+              
+            ),
+            
+            # Column 3
+            column(
+              4,
+              selectInput(
+                'facet_row',
+                'Facet Row', 
+                c(None='.', names(dataset))
+              ),
+              selectInput(
+                'facet_col',
+                'Facet Column',
+                c(None='.', names(dataset))
               )
             )
-          ),
-          tabPanel(
-            "Size",
-            checkboxInput("fig_size",
-                          strong("Adjust plot size on screen"), FALSE),
-            conditionalPanel(
-              condition = "input.fig_size",
-              numericInput("fig_height", "Plot height (# pixels): ",
-                           value = 480),
-              numericInput("fig_width", "Plot width (# pixels):", value = 580)
-            ),
-            checkboxInput("fig_size_download",
-                          strong("Adjust plot size for download"), FALSE),
-            conditionalPanel(
-              condition = "input.fig_size_download",
-              numericInput("fig_height_download",
-                           "Plot height (in cm):", value = 14),
-              numericInput("fig_width_download",
-                           "Plot width (in cm):", value = 14)
-            )
+            
           )
-        ) # Close tabsetPanel
-      ) # Close sidebarPanel
-    ) # Close conditionalPanel
+          
+        ),
+        
+        # Interactive Plot Tab ------------------------------------------------
+        
+        tabPanel(
+          "Interactive Plot", 
+          plotlyOutput("out_plotly")
+        ),
+        
+        # Code Tab ------------------------------------------------------------
+        
+        tabPanel(
+          "Code", 
+          verbatimTextOutput("out_r_code")
+        ),
+        tabPanel(
+          "Help",
+          shiny::includeMarkdown(
+            system.file("/vignettes/help_tab.Rmd", package = "datapie")
+          )
+        ),
+        
+        id = "tabs"
+        
+      ),
+      
+      conditionalPanel(
+        condition="$('html').hasClass('shiny-busy')",
+        tags$div(
+          "Loading...",
+          id="loadmessage"
+        )
+      )
+      
+    )
     
-    #######
-  ) #end fluidPanel
+  ) #end fluidPage
   
   ############Server function ############
   server <- shinyServer(function(input, output, session) {
