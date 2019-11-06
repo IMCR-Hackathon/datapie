@@ -591,6 +591,9 @@ datapie_shiny <- function( dataset = NA ) {
   
   ############Server function ############
   server <- shinyServer(function(input, output, session) {
+    
+    # Set file size upload limit for locally uploaded files
+    options(shiny.maxRequestSize = 5e9)
   
   #####################################
   ######### GET DATA FROM DOI #########
