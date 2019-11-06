@@ -553,7 +553,7 @@ datapie_shiny <- function( dataset = NA ) {
           ),
           
           fluidRow(
-            plotlyOutput("out_plotly", height = "700px")
+            plotly:: plotlyOutput("out_plotly", height = "700px")
           )
           
         ),
@@ -1286,10 +1286,8 @@ datapie_shiny <- function( dataset = NA ) {
       output$out_plotly <- renderPlotly({
         # evaluate the string RCode as code
         df <- get_subset()#note: this is a subset of data from df_shiny as we select the range of interest()
-        p <- try(eval(parse(text = string_code())), silent = TRUE)
-        if (class(p) != "try-error") {
-          p
-        }
+        p <- eval(parse(text = string_code()))
+        p
       })
   
   #####################################
