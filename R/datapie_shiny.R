@@ -200,7 +200,7 @@ datapie_shiny <- function( dataset = NA ) {
                   inputId = "y_var",
                   label = "Y-variable:",
                   choices = ""
-                ),
+                )
                 # FIXME: Stopped working when code was refactored for plotly
                 # # Y-coercion
                 # selectInput(
@@ -216,22 +216,6 @@ datapie_shiny <- function( dataset = NA ) {
                 #   value = FALSE
                 # ),
                 # Smoothing options
-                conditionalPanel(
-                  condition = "input.line == true",
-                  selectInput(
-                    "smooth",
-                    "Smoothening function",
-                    choices = c("lm", "loess", "gam")
-                  )
-                ),
-                # Confidence interval
-                conditionalPanel(
-                  condition = "input.line == true",
-                  checkboxInput(
-                    inputId = "se",
-                    label = strong("Show confidence interval"),
-                    value = FALSE)
-                )
               )
               
             ),
@@ -245,11 +229,11 @@ datapie_shiny <- function( dataset = NA ) {
               #   "Group:", 
               #   choices = ""
               # ),
-              # selectInput(
-              #   "facet_row", 
-              #   "Facet row:", 
-              #   choices = ""
-              # ),
+              selectInput(
+                "facet_row",
+                "Facet row:",
+                choices = ""
+              ),
               # selectInput(
               #   "facet_col",
               #   "Facet column:",
@@ -259,7 +243,7 @@ datapie_shiny <- function( dataset = NA ) {
               conditionalPanel(
                 condition = "input.Type == 'Scatter' || input.Type == 'Histogram' || input.Type == 'Boxplot'",
                 sliderInput(
-                  "alpha", 
+                  "input_alpha", 
                   "Opacity:", 
                   min = 0, 
                   max = 1, 
@@ -276,236 +260,35 @@ datapie_shiny <- function( dataset = NA ) {
                 # Y-range
                 uiOutput("data_range_y")
               )
-            )
+            ),
             
             # Column 3 -----------------
-            # column(
-            #   4,
-            #   offset = 1,
-            #   p(),
-            #   # Text
-            #   tabsetPanel(
-            #     
-            #     tabPanel(
-            #       "Text",
-            #       # Axes labels
-            #       checkboxInput(
-            #         inputId = "label_axes",
-            #         label = strong("Change labels axes"),
-            #         value = FALSE
-            #       ),
-            #       conditionalPanel(
-            #         condition = "input.label_axes == true",
-            #         textInput("lab_x", "X-axis:", value = "label x-axis")
-            #       ),
-            #       conditionalPanel(
-            #         condition = "input.label_axes == true",
-            #         textInput(
-            #           "lab_y", 
-            #           "Y-axis:", 
-            #           value = "label y-axis"
-            #         )
-            #       ),
-            #       # Title
-            #       checkboxInput(
-            #         inputId = "add_title",
-            #         label = strong("Add title"),
-            #         value = FALSE
-            #       ),
-            #       conditionalPanel(
-            #         condition = "input.add_title == true",
-            #         textInput("title", "Title:", value = "Title")
-            #       ),
-            #       # Font size
-            #       checkboxInput(
-            #         inputId = "adj_fnt_sz",
-            #         label = strong("Change font size"),
-            #         value = FALSE
-            #       ),
-            #       conditionalPanel(
-            #         condition = "input.adj_fnt_sz",
-            #         numericInput(
-            #           "fnt_sz_ttl",
-            #           "Size axis titles:",
-            #           value = 16
-            #         ),
-            #         numericInput(
-            #           "fnt_sz_ax",
-            #           "Size axis labels:",
-            #           value = 12
-            #         )
-            #       ),
-            #       # Rotate text
-            #       checkboxInput(
-            #         inputId = "rot_txt",
-            #         label = strong("Rotate text x-axis"),
-            #         value = FALSE
-            #       ),
-            #       # Font
-            #       checkboxInput(
-            #         inputId = "adj_fnt",
-            #         label = strong("Change font"),
-            #         value = FALSE
-            #       ),
-            #       conditionalPanel(
-            #         condition = "input.adj_fnt == true",
-            #         selectInput(
-            #           "font", 
-            #           "Font",
-            #           choices = c("Courier", "Helvetica", "Times"),
-            #           selected = "Helvetica"
-            #         )
-            #       ),
-            #       # Download
-            #       downloadButton(
-            #         "download_plot_PNG",
-            #         "Download plot"
-            #       )
-            #     ),
-            #     
-            #     # Theme -------------------------------------------------------
-            #     
-            #     tabPanel(
-            #       "Theme",
-            #       conditionalPanel(
-            #         condition = "input.group != '.'",
-            #         checkboxInput(
-            #           inputId = "adj_col",
-            #           label = strong("Change colors"),
-            #           value = FALSE
-            #         ),
-            #         conditionalPanel(
-            #           condition = "input.adj_col",
-            #           selectInput(
-            #             inputId = "palet",
-            #             label = strong("Select palette"),
-            #             choices = list(
-            #               "Qualitative" = c("Accent", "Dark2", "Paired", 
-            #                                 "Pastel1", "Pastel2", "Set1",
-            #                                 "Set2", "Set3"
-            #               ),
-            #               "Diverging" = c("BrBG", "PiYG", "PRGn", "PuOr",
-            #                               "RdBu", "RdGy", "RdYlBu", "RdYlGn",
-            #                               "Spectral"
-            #               ),
-            #               "Sequential" = c("Blues", "BuGn", "BuPu", "GnBu",
-            #                                "Greens", "Greys", "Oranges", 
-            #                                "OrRd", "PuBu", "PuBuGn", "PuRd",
-            #                                "Purples", "RdPu", "Reds", "YlGn",
-            #                                "YlGnBu", "YlOrBr", "YlOrRd"
-            #               )
-            #             ),
-            #             selected = "set1"
-            #           )
-            #         )
-            #       ),
-            #       
-            #       # Jitter ----------------------------------------------------
-            #       
-            #       conditionalPanel(
-            #         condition = "input.jitter",
-            #         checkboxInput(
-            #           "adj_jitter",
-            #           strong("Change look jitter"), 
-            #           FALSE
-            #         ),
-            #         conditionalPanel(
-            #           condition = "input.adj_jitter",
-            #           textInput(
-            #             "col_jitter", 
-            #             "Colour (name or RGB):",
-            #             value = "black"
-            #           ),
-            #           numericInput(
-            #             "size_jitter", 
-            #             "Size:", 
-            #             value = 2
-            #           ),
-            #           sliderInput(
-            #             "opac_jitter",
-            #             "Opacity:",
-            #             min = 0, 
-            #             max = 1, 
-            #             value = 0.5, 
-            #             step = 0.01
-            #           ),
-            #           sliderInput(
-            #             "width_jitter", 
-            #             "Width jitter:",
-            #             min = 0, 
-            #             max = 0.5, 
-            #             value = 0.25, 
-            #             step = 0.01
-            #           )
-            #         )
-            #       ),
-            #       
-            #       # Grid ------------------------------------------------------
-            #       
-            #       checkboxInput(
-            #         "adj_grd",
-            #         strong("Remove gridlines"), 
-            #         FALSE
-            #       ),
-            #       conditionalPanel(
-            #         condition = "input.adj_grd",
-            #         checkboxInput(
-            #           "grd_maj",
-            #           strong("Remove major gridlines"), 
-            #           FALSE
-            #         ),
-            #         checkboxInput(
-            #           "grd_min",
-            #           strong("Remove minor gridlines"), 
-            #           FALSE
-            #         )
-            #       ),
-            #       selectInput(
-            #         "theme",
-            #         "Theme",
-            #         choices = c(
-            #           "bw" = "theme_bw()", "classic" = "theme_classic()",
-            #           "dark" = "theme_dark()", "grey" = "theme_grey()",
-            #           "light" = "theme_light()", 
-            #           "line_draw" = "theme_linedraw()",
-            #           "minimal" = "theme_minimal()"
-            #         ),
-            #         selected = "theme_bw()"
-            #       )
-            #     ),
-            #     
-            #     # Legend ------------------------------------------------------
-            #     
-            #     tabPanel(
-            #       "Legend",
-            #       conditionalPanel(
-            #         condition = "input.group != '.'",
-            #         radioButtons(
-            #           inputId = "adj_leg",
-            #           label = NULL,
-            #           choices = c("Keep legend as it is", "Remove legend", 
-            #                       "Change legend"
-            #           ),
-            #           selected = "Keep legend as it is"
-            #         ),
-            #         # Change legend
-            #         conditionalPanel(
-            #           condition = "input.adj_leg=='Change legend'",
-            #           # Title
-            #           textInput(
-            #             "leg_ttl",
-            #             "Title legend:",
-            #             value = "title legend"
-            #           ),
-            #           # Position
-            #           selectInput(
-            #             "pos_leg", 
-            #             "Position legend",
-            #             choices = c("right", "left", "top", "bottom")
-            #           )
-            #         )
-            #       )
-            #     ),
+            column(
+              4,
+              offset = 1,
+              p(),
+              # Text
+              tabsetPanel(
+
+                tabPanel(
+                  "Text",
+                  # Title
+                  checkboxInput(
+                    inputId = "add_title",
+                    label = strong("Add title"),
+                    value = FALSE
+                  ),
+                  conditionalPanel(
+                    condition = "input.add_title == true",
+                    textInput("add_title", "Title:", value = "Title")
+                  ),
+                  # Download
+                  downloadButton(
+                    "download_plot_PNG",
+                    "Download plot"
+                  )
+                )
+            
             #     
             #     # Figure size -------------------------------------------------
             #     
@@ -548,8 +331,8 @@ datapie_shiny <- function( dataset = NA ) {
             #         )
             #       )
             #     )
-            #   )
-            # )
+              )
+            )
           ),
           
           fluidRow(
@@ -575,15 +358,15 @@ datapie_shiny <- function( dataset = NA ) {
         
         id = "tabs"
         
-      ),
+      )#,
       
-      conditionalPanel(
-        condition="$('html').hasClass('shiny-busy')",
-        tags$div(
-          "Loading...",
-          id="loadmessage"
-        )
-      )
+      # conditionalPanel(
+      #   condition="$('html').hasClass('shiny-busy')",
+      #   tags$div(
+      #     "Loading...",
+      #     id="loadmessage"
+      #   )
+      # )
       
     )
     
@@ -1019,45 +802,45 @@ datapie_shiny <- function( dataset = NA ) {
     ####### CREATE GRAPH CODE FOR USER UPLOADED DATA ##########
     ###########################################################
     
-    string_upload_code <- reactive({
-      
-      file_in <- input$upload
-      
-      if (input$data_input == 3) {
-        
-        # Avoid error message while file is not uploaded yet
-        if (is.null(input$upload)) {
-        } else if (input$submit_datafile_button == 0) {
-        } else {
-          isolate({
-            if (input$file_type == "text") {
-              p <- paste0(
-                "readr::read_delim('", file_in$name, "', delim = '", input$upload_delim, "', ", "col_names = TRUE)"
-              )
-            } else if (input$file_type == "Excel") {
-              p <- paste0(
-                "readxl::read_excel(", file_in$name, ")"
-              )
-            } else if (input$file_type == "SPSS") {
-              p <- paste0(
-                "haven::read_sav(", file_in$name, ")"
-              )
-            } else if (input$file_type == "Stata") {
-              p <- paste0(
-                "haven::read_dta(", file_in$name, ")"
-              )
-            } else if (input$file_type == "SAS") {
-              p <- paste0(
-                "haven::read_sas(", file_in$name, ")"
-              )
-            }
-          })
-        }
-        
-      }
-      p
-      
-    })
+    # string_upload_code <- reactive({
+    #   
+    #   file_in <- input$upload
+    #   
+    #   if (input$data_input == 3) {
+    #     
+    #     # Avoid error message while file is not uploaded yet
+    #     if (is.null(input$upload)) {
+    #     } else if (input$submit_datafile_button == 0) {
+    #     } else {
+    #       isolate({
+    #         if (input$file_type == "text") {
+    #           p <- paste0(
+    #             "readr::read_delim('", file_in$name, "', delim = '", input$upload_delim, "', ", "col_names = TRUE)"
+    #           )
+    #         } else if (input$file_type == "Excel") {
+    #           p <- paste0(
+    #             "readxl::read_excel(", file_in$name, ")"
+    #           )
+    #         } else if (input$file_type == "SPSS") {
+    #           p <- paste0(
+    #             "haven::read_sav(", file_in$name, ")"
+    #           )
+    #         } else if (input$file_type == "Stata") {
+    #           p <- paste0(
+    #             "haven::read_dta(", file_in$name, ")"
+    #           )
+    #         } else if (input$file_type == "SAS") {
+    #           p <- paste0(
+    #             "haven::read_sas(", file_in$name, ")"
+    #           )
+    #         }
+    #       })
+    #     }
+    #     
+    #   }
+    #   p
+    #   
+    # })
     
   #####################################
   ####### CREATE GRAPH-CODE ###########
@@ -1065,188 +848,299 @@ datapie_shiny <- function( dataset = NA ) {
     
     string_code <- reactive({
       
-      # Variable used for how to deal with x/y in ggplot
-      gg_x_y <- input$Type == "Histogram"
+      write_plot_script <- function(x_var = "None selected", 
+                                    y_var = "None selected", 
+                                    Type = "None selected", 
+                                    input_alpha = "None selected", 
+                                    group = "None selected", 
+                                    group_type = "None selected", 
+                                    group2 = "None selected", 
+                                    add_title = "None selected", 
+                                    x_cast = "None selected", 
+                                    y_cast = "None selected") {
+        
+        # Basic plots
+        if (Type == "Scatter") {
+          p <- "plotly::plot_ly(data = df, type = 'scatter', alpha = input_alpha, x = ~x_var, y = ~y_var, color = I('black'))"
+        } else if (Type == "Histogram") {
+          p <- "plot_ly(data = df, type = 'histogram', alpha = input_alpha, x = ~x_var, color = I('black'))"
+        } else if (Type == "Boxplot") {
+          p <- "plot_ly(data = df, type = 'box', alpha = input_alpha, y = ~x_var, color = I('black'))"
+        }
+        
+        # Grouped plots
+        if ((Type == "Scatter") & (group != "None selected")) {
+          if (group_type == "factor") {
+            p <- "df %>% mutate(group = factor(group)) %>% plotly::plot_ly(type = 'scatter', alpha = input_alpha, x = ~x_var, y = ~y_var, color = ~group, colors = 'Dark2') %>% layout(annotations = list(yref = 'paper', xref = 'paper', y = 1.05, x = 1.1, text = 'group', showarrow = F))"
+          } else if (group_type == "continuous") {
+            p <- "df %>% mutate(group = as.numeric(group)) %>% plotly::plot_ly(type = 'scatter', alpha = input_alpha, x = ~x_var, y = ~y_var, color = ~group)"
+          }
+        } else if ((Type == "Histogram") & (group != "None selected")) {
+          p <- "df %>% mutate(group = factor(group)) %>% plot_ly(type = 'histogram', alpha = input_alpha, x = ~x_var, color = ~group, colors = 'Dark2') %>% layout(barmode = 'overlay') %>% layout(annotations = list(yref = 'paper', xref = 'paper', y = 1.05, x = 1.1, text = 'group', showarrow = F))"
+        } else if ((Type == "Boxplot") & (group != "None selected")) {
+          if ((group != "None selected") & (group2 != "None selected")) {
+            p <- "df %>% mutate(group = factor(group)) %>% mutate(group2 = factor(group2)) %>% plot_ly(type = 'box', alpha = input_alpha, x = ~group, y = ~x_var, color = ~group2, colors = 'Dark2') %>% layout(boxmode = 'group', annotations = list(yref = 'paper', xref = 'paper', y = 1.05, x = 1.1, text = 'group2', showarrow = F))"
+          } else {
+            p <- "df %>% mutate(group = factor(group)) %>% plot_ly(type = 'box', alpha = input_alpha, y = ~x_var, color = ~group, colors = 'Dark2') %>% layout(showlegend = TRUE) %>% layout(annotations = list(yref = 'paper', xref = 'paper', y = 1.05, x = 1.1, text = 'group', showarrow = F))"
+          }
+          
+        }
+        
+        # Coerce X and Y variables
+        if (x_cast != "None selected") {
+          if (x_cast == 'character') {
+            p <- stringr::str_replace(p, "~x_var", "~as.character(x_var)")
+          } else if (x_cast == 'numeric') {
+            p <- stringr::str_replace(p, "~x_var", "~as.numeric(x_var)")
+          } else if (x_cast == 'Date') {
+            p <- stringr::str_replace(p, "~x_var", "~as.Date(x_var)")
+          } else if (x_cast == 'factor') {
+            p <- stringr::str_replace(p, "~x_var", "~as.factor(x_var)")
+          }
+        } else if (y_cast != "None selected") {
+          if (y_cast == 'character') {
+            p <- stringr::str_replace(p, "~y_var", "~as.character(y_var)")
+          } else if (y_cast == 'numeric') {
+            p <- stringr::str_replace(p, "~y_var", "~as.numeric(y_var)")
+          } else if (y_cast == 'Date') {
+            p <- stringr::str_replace(p, "~y_var", "~as.Date(y_var)")
+          } else if (y_cast == 'factor') {
+            p <- stringr::str_replace(p, "~y_var", "~as.factor(x_var)")
+          }
+        }
+        
+        # Title
+        if (add_title != "None selected") {
+          p <- paste(p, " %>% layout(title = 'add_title')")
+        }
+        
+        # Performance enhancement with WebGL()
+        p <- paste0(p, " %>% plotly::toWebGL()")
+        
+        # Replace variables with values
+        p <- str_replace_all(
+          p,
+          c("y_var" = y_var,
+            "y_cast" = y_cast,
+            "x_var" = x_var,
+            "x_cast" = x_cast,
+            "group_type" = group_type,
+            "group2" = group2,
+            "(?<!boxmode[:space:]=[:space:].|legend)group" = group,
+            "input_alpha" = as.character(input_alpha),
+            "add_title" = as.character(add_title)
+          )
+        )
+        
+        # Make code legible
+        p <- str_replace_all(p, ",\n    \\)", "\n  \\)")
+        p
+        
+      }
       
-      # Variable used for how to deal with color/fill
-      gg_fil <- input$Type == "Histogram" ||
-        input$Type == "Scatter"
-      
-      p <- paste0(
-        
-        "plotly::plot_ly(data = df, type = ",
-        if (input$Type == "Scatter") {
-          "'scatter'"
-        } else if (input$Type == "Histogram") {
-          "'histogram'"
-        } else if (input$Type == "Boxplot") {
-          "'box'"
-        },
-        
-        # FIXME: Move this to the server
-        # # Coerce X variable
-        # if (input$x_cast == 'character') {
-        #   "x = as.character(`input$x_var`)"
-        # } else if (input$x_cast == 'numeric') {
-        #   "x = as.numeric(`input$x_var`)"
-        # } else if (input$x_cast == 'Date') {
-        #   "x = as.Date(`input$x_var`)"
-        # } else {
-        #   "x = `input$x_var`"
-        # },
-
-        # FIXME: Move this to the server
-        # # Coerce Y variable
-        # if (!gg_x_y) {
-        #   if(input$y_cast == 'character') {
-        #     ", y = as.character(`input$y_var`)"
-        #   } else if (input$y_cast == 'numeric') {
-        #     ", y = as.numeric(`input$y_var`)"
-        #   } else if (input$y_cast == 'Date') {
-        #     ", y = as.Date(`input$y_var`)"
-        #   } else {
-        #     ", y = `input$y_var`"
-        #   }
-        # },
-        
-        ") %>% ",
-        
-        #     "add_markers(x = ~`input$x_var`, y = ~`input$y_var`, color = I('black'), alpha = input$alpha) %>% ",
-        
-        if (input$Type == "Scatter") {
-          "add_markers(x = ~`input$x_var`, y = ~`input$y_var`, color = I('black'), alpha = input$alpha)"
-        },
-        
-        # # if (input$group != "." && gg_fil) {
-        # #   ", fill = `input$group`"
-        # # } else if (input$group != "." && !gg_fil) {
-        # #   ", color = `input$group`"
-        # # },
-        # 
-        # ")) + ",
-        
-        if (input$Type == "Histogram") {
-          "add_histogram(x = ~`input$x_var`, color = I('black'), alpha = input$alpha)"
-        },
-        
-        if (input$Type == "Boxplot") {
-          "add_trace(y = ~`input$x_var`, color = I('black'), alpha = input$alpha)"
-        },
-        
-        " %>% ",
-
-        "plotly::toWebGL()"
-
-        # FIXME:
-        # if (input$Type == "Scatter" && input$line) {
-        #   "+ geom_smooth(se = input$se, method = 'input$smooth')"
-        # },
-
+      write_plot_script(
+        x_var = input$x_var, 
+        y_var = input$y_var, 
+        Type = input$Type, 
+        input_alpha = input$input_alpha, 
+        group = input$group, 
+        group_type = input$group_type, 
+        group2 = input$group2, 
+        add_title = input$add_title, 
+        x_cast = input$x_cast, 
+        y_cast = input$y_cast
       )
-      
-      # FIXME:
-      # # if at least one facet column/row is specified, add it
-      # facets <- gsub("`.`",".",paste0('`',input$facet_row,'`',"~", '`',input$facet_col,'`'),fixed=T)
-      # if (facets != ".~.")  # remove the space
-      #   p <- paste(p, "+ facet_grid(", facets, ")")
-      
-      # FIXME:
-      # # if labels specified
-      # if (input$label_axes)
-      #   p <- paste(p, "+ labs(x = 'input$lab_x', y = 'input$lab_y')")
-      
-      # FIXME:
-      # # if title specified
-      # if (input$add_title)
-      #   p <- paste(p, "+ ggtitle('input$title')")
-      
-      # FIXME:
-      # # if legend specified
-      # if (input$adj_leg == "Change legend")
-      #   p <- paste0(p, "+ labs(",
-      #               if (gg_fil) "fill" else "color",
-      #               " = 'input$leg_ttl')")
-      
-      # FIXME:
-      # # if color legend specified
-      # if (input$adj_col)
-      #   p <- paste(p, "+ scale_",
-      #              if (gg_fil) "fill" else "color",
-      #              "_brewer(palette = 'input$palet')")
-      
-      # FIXME:
-      # # If a theme specified
-      # p <- paste(p, "+", input$theme)
-      
-      # FIXME:
-      # # If theme features are specified
-      # if (input$adj_fnt_sz ||
-      #     input$adj_fnt ||
-      #     input$rot_txt ||
-      #     input$adj_leg != "Keep legend as it is" ||
-      #     input$adj_grd) {
-      #   p <- paste(
-      #     p,
-      #     paste(
-      #       " + theme(\n    ",
-      #       if (input$adj_fnt_sz)
-      #         "axis.title = element_text(size = input$fnt_sz_ttl),\n    ",
-      #       if (input$adj_fnt_sz)
-      #         "axis.text = element_text(size = input$fnt_sz_ax),\n    ",
-      #       if (input$adj_fnt)
-      #         "text = element_text(family = 'input$font'),\n    ",
-      #       if (input$rot_txt)
-      #         "axis.text.x = element_text(angle = 45, hjust = 1),\n    ",
-      #       if (input$adj_leg == "Remove legend")
-      #         "legend.position = 'none',\n    ",
-      #       if (input$adj_leg == "Change legend")
-      #         "legend.position = 'input$pos_leg',\n    ",
-      #       if (input$grd_maj)
-      #         "panel.grid.major = element_blank(),\n    ",
-      #       if (input$grd_min)
-      #         "panel.grid.minor = element_blank(),\n    ",
-      #       ")",
-      #       sep = ""
-      #     ),
-      #     sep = ""
-      #   )
-      # }
-      
-      # Replace name of variables by values
-      p <- str_replace_all(
-        p,
-        c("input\\$y_var" = input$y_var,
-          "input\\$y_cast" = input$y_cast,
-          "input\\$x_var" = input$x_var,
-          "input\\$x_cast" = input$x_cast,
-          "input\\$group" = input$group,
-          # "input\\$notch" = as.character(input$notch),
-          "input\\$binwidth" = as.character(input$binwidth),
-          # "input\\$adj_bw" = as.character(input$adj_bw),
-          # "input\\$dot_dir" = as.character(input$dot_dir),
-          "input\\$alpha" = as.character(input$alpha),
-          "input\\$se" = as.character(input$se),
-          "input\\$smooth" = as.character(input$smooth),
-          # "input\\$CI" = as.character(input$CI),
-          "input\\$size_jitter" = as.character(input$size_jitter),
-          "input\\$width_jitter" = as.character(input$width_jitter),
-          "input\\$opac_jitter" = as.character(input$opac_jitter),
-          "input\\$col_jitter" = as.character(input$col_jitter),
-          "input\\$lab_x" = as.character(input$lab_x),
-          "input\\$lab_y" = as.character(input$lab_y),
-          "input\\$title" = as.character(input$title),
-          "input\\$palet" = as.character(input$palet),
-          "input\\$fnt_sz_ttl" = as.character(input$fnt_sz_ttl),
-          "input\\$fnt_sz_ax" = as.character(input$fnt_sz_ax),
-          "input\\$font" = as.character(input$font),
-          "input\\$leg_ttl" = as.character(input$leg_ttl),
-          "input\\$pos_leg" = as.character(input$pos_leg))
-      )
-      # Creates well-formatted Code for output
-      p <- str_replace_all(p, ",\n    \\)", "\n  \\)")
-      p
       
     })
+
+    # string_code <- reactive({
+    # 
+    #   # Variable used for how to deal with x/y in ggplot
+    #   gg_x_y <- input$Type == "Histogram"
+    # 
+    #   # Variable used for how to deal with color/fill
+    #   gg_fil <- input$Type == "Histogram" ||
+    #     input$Type == "Scatter"
+    # 
+    #   p <- paste0(
+    # 
+    #     # # if at least one facet column/row is specified, add it
+    #     # facets <- gsub("`.`",".",paste0('`',input$facet_row,'`',"~", '`',input$facet_col,'`'),fixed=T)
+    #     # if (facets != ".~.")  # remove the space
+    #     #   p <- paste(p, "+ facet_grid(", facets, ")")
+    # 
+    #     "plotly::plot_ly(type = ",
+    #     if (input$Type == "Scatter") {
+    #       "'scatter'"
+    #     } else if (input$Type == "Histogram") {
+    #       "'histogram'"
+    #     } else if (input$Type == "Boxplot") {
+    #       "'box'"
+    #     },
+    #     ")",
+    # 
+    #     # FIXME: Move this to the server
+    #     # # Coerce X variable
+    #     # if (input$x_cast == 'character') {
+    #     #   "x = as.character(`input$x_var`)"
+    #     # } else if (input$x_cast == 'numeric') {
+    #     #   "x = as.numeric(`input$x_var`)"
+    #     # } else if (input$x_cast == 'Date') {
+    #     #   "x = as.Date(`input$x_var`)"
+    #     # } else {
+    #     #   "x = `input$x_var`"
+    #     # },
+    # 
+    #     # FIXME: Move this to the server
+    #     # # Coerce Y variable
+    #     # if (!gg_x_y) {
+    #     #   if(input$y_cast == 'character') {
+    #     #     ", y = as.character(`input$y_var`)"
+    #     #   } else if (input$y_cast == 'numeric') {
+    #     #     ", y = as.numeric(`input$y_var`)"
+    #     #   } else if (input$y_cast == 'Date') {
+    #     #     ", y = as.Date(`input$y_var`)"
+    #     #   } else {
+    #     #     ", y = `input$y_var`"
+    #     #   }
+    #     # },
+    # 
+    #     #     "add_markers(x = ~`input$x_var`, y = ~`input$y_var`, color = I('black'), alpha = input$alpha) %>% ",
+    # 
+    #     if (input$Type == "Scatter") {
+    #       " %>% add_markers(x = ~`input$x_var`, y = ~`input$y_var`, color = I('black'), alpha = input$alpha)"
+    #     },
+    # 
+    #     # # if (input$group != "." && gg_fil) {
+    #     # #   ", fill = `input$group`"
+    #     # # } else if (input$group != "." && !gg_fil) {
+    #     # #   ", color = `input$group`"
+    #     # # },
+    #     #
+    #     # ")) + ",
+    # 
+    #     if (input$Type == "Histogram") {
+    #       " %>% add_histogram(x = ~`input$x_var`, color = I('black'), alpha = input$alpha)"
+    #     },
+    # 
+    #     if (input$Type == "Boxplot") {
+    #       " %>% add_trace(y = ~`input$x_var`, color = I('black'), alpha = input$alpha)"
+    #     }
+    # 
+    #     # FIXME:
+    #     # if (input$Type == "Scatter" && input$line) {
+    #     #   "+ geom_smooth(se = input$se, method = 'input$smooth')"
+    #     # },
+    # 
+    #   )
+    # 
+    #   # Facet rows
+    #   if (input$facet_row != "None selected") {
+    #     p <- paste0(
+    #       "df %>% split(df$`input$facet_row`) %>% lapply(function(x) {",
+    #       p,
+    #       "})",
+    #       " %>% subplot(nrows = length(unique(df$`input$facet_row`)), shareX = TRUE)"
+    #     )
+    #   } else {
+    #     p <- paste0("df %>% ", p)
+    #   }
+    # 
+    #   # FIXME:
+    #   # # if labels specified
+    #   # if (input$label_axes)
+    #   #   p <- paste(p, "+ labs(x = 'input$lab_x', y = 'input$lab_y')")
+    # 
+    #   # FIXME:
+    #   # # if add_title specified
+    #   # if (input$add_title)
+    #   #   p <- paste(p, "+ ggtitle('input$add_title')")
+    # 
+    #   # FIXME:
+    #   # # if legend specified
+    #   # if (input$adj_leg == "Change legend")
+    #   #   p <- paste0(p, "+ labs(",
+    #   #               if (gg_fil) "fill" else "color",
+    #   #               " = 'input$leg_ttl')")
+    # 
+    # 
+    #   # FIXME:
+    #   # # If a theme specified
+    #   # p <- paste(p, "+", input$theme)
+    # 
+    #   # FIXME:
+    #   # # If theme features are specified
+    #   # if (input$adj_fnt_sz ||
+    #   #     input$adj_fnt ||
+    #   #     input$rot_txt ||
+    #   #     input$adj_leg != "Keep legend as it is" ||
+    #   #     input$adj_grd) {
+    #   #   p <- paste(
+    #   #     p,
+    #   #     paste(
+    #   #       " + theme(\n    ",
+    #   #       if (input$adj_fnt_sz)
+    #   #         "axis.add_title = element_text(size = input$fnt_sz_ttl),\n    ",
+    #   #       if (input$adj_fnt_sz)
+    #   #         "axis.text = element_text(size = input$fnt_sz_ax),\n    ",
+    #   #       if (input$adj_fnt)
+    #   #         "text = element_text(family = 'input$font'),\n    ",
+    #   #       if (input$rot_txt)
+    #   #         "axis.text.x = element_text(angle = 45, hjust = 1),\n    ",
+    #   #       if (input$adj_leg == "Remove legend")
+    #   #         "legend.position = 'none',\n    ",
+    #   #       if (input$adj_leg == "Change legend")
+    #   #         "legend.position = 'input$pos_leg',\n    ",
+    #   #       if (input$grd_maj)
+    #   #         "panel.grid.major = element_blank(),\n    ",
+    #   #       if (input$grd_min)
+    #   #         "panel.grid.minor = element_blank(),\n    ",
+    #   #       ")",
+    #   #       sep = ""
+    #   #     ),
+    #   #     sep = ""
+    #   #   )
+    #   # }
+    # 
+    #   # Enhance performance with WebGL()
+    #   p <- paste0(p, " %>% plotly::toWebGL()")
+    # 
+    # 
+    #   # Replace x_var and y_var with values
+    #   p <- str_replace_all(
+    #     p,
+    #     c("input\\$y_var" = input$y_var,
+    #       "input\\$y_cast" = input$y_cast,
+    #       "input\\$x_var" = input$x_var,
+    #       "input\\$x_cast" = input$x_cast,
+    #       "input\\$group" = input$group,
+    #       # "input\\$notch" = as.character(input$notch),
+    #       "input\\$binwidth" = as.character(input$binwidth),
+    #       # "input\\$adj_bw" = as.character(input$adj_bw),
+    #       # "input\\$dot_dir" = as.character(input$dot_dir),
+    #       "input\\$alpha" = as.character(input$alpha),
+    #       "input\\$se" = as.character(input$se),
+    #       "input\\$smooth" = as.character(input$smooth),
+    #       # "input\\$size_jitter" = as.character(input$CI),
+    #       "input\\$size_jitter" = as.character(input$size_jitter),
+    #       "input\\$width_jitter" = as.character(input$width_jitter),
+    #       "input\\$opac_jitter" = as.character(input$opac_jitter),
+    #       "input\\$col_jitter" = as.character(input$col_jitter),
+    #       "input\\$lab_x" = as.character(input$lab_x),
+    #       "input\\$lab_y" = as.character(input$lab_y),
+    #       "input\\$add_title" = as.character(input$add_title),
+    #       "input\\$palet" = as.character(input$palet),
+    #       "input\\$fnt_sz_ttl" = as.character(input$fnt_sz_ttl),
+    #       "input\\$fnt_sz_ax" = as.character(input$fnt_sz_ax),
+    #       "input\\$font" = as.character(input$font),
+    #       "input\\$leg_ttl" = as.character(input$leg_ttl),
+    #       "input\\$pos_leg" = as.character(input$pos_leg))
+    #   )
+    #   # Creates well-formatted Code for output
+    #   p <- str_replace_all(p, ",\n    \\)", "\n  \\)")
+    #   p
+    # 
+    # })
     
   
   
@@ -1376,38 +1270,38 @@ datapie_shiny <- function( dataset = NA ) {
           )
         } else if (input$data_input == 3) {
           
-          gg_code <- string_code()
-          gg_code <- str_replace_all(gg_code, "\\+ ", "+\n  ")
+          # gg_code <- string_code()
+          # gg_code <- str_replace_all(gg_code, "\\+ ", "+\n  ")
           
-          upcode <- string_upload_code()
-          upcode <- str_replace_all(upcode, "\\+ ", "+\n  ")
+          # upcode <- string_upload_code()
+          # upcode <- str_replace_all(upcode, "\\+ ", "+\n  ")
           
-          paste(
-            "## You can use the code below to make the 'Plot' tab figure.\n\n",
-            "# You will need the following package(s):\n",
-            "library(\"datapie\")\n",
-            "library(\"ggplot2\")\n\n",
-            
-            "# The code below will load your data:\n",
-            "# df <- ", upcode, "\n\n",
-            "# The code below will generate the 'Plot' tab figure:\n",
-            "graph <- ",
-            gg_code,
-            "\ngraph\n\n",
-            "# If you want the plot to be interactive,\n",
-            "# you need the following package(s):\n",
-            "library(\"plotly\")\n\n",
-            "# The code below will generate the 'Interactive Plot'\n",
-            "# tab figure:\n",
-            "ggplotly(graph)\n\n",
-            "# The code below will save your plot:\n",
-            "ggsave('my_graph.pdf', graph, width = ",
-            width_download(),
-            ", height = ",
-            height_download(),
-            ", units = 'cm')",
-            sep = ""
-          )
+          # paste(
+          #   "## You can use the code below to make the 'Plot' tab figure.\n\n",
+          #   "# You will need the following package(s):\n",
+          #   "library(\"datapie\")\n",
+          #   "library(\"ggplot2\")\n\n",
+          #   
+          #   "# The code below will load your data:\n",
+          #   "# df <- ", upcode, "\n\n",
+          #   "# The code below will generate the 'Plot' tab figure:\n",
+          #   "graph <- ",
+          #   gg_code,
+          #   "\ngraph\n\n",
+          #   "# If you want the plot to be interactive,\n",
+          #   "# you need the following package(s):\n",
+          #   "library(\"plotly\")\n\n",
+          #   "# The code below will generate the 'Interactive Plot'\n",
+          #   "# tab figure:\n",
+          #   "ggplotly(graph)\n\n",
+          #   "# The code below will save your plot:\n",
+          #   "ggsave('my_graph.pdf', graph, width = ",
+          #   width_download(),
+          #   ", height = ",
+          #   height_download(),
+          #   ", units = 'cm')",
+          #   sep = ""
+          # )
           
         }
 
