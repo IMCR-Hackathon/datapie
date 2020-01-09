@@ -27,6 +27,7 @@ Imports:
     magrittr,
     metajam,
     plotly,
+    processx,
     RColorBrewer,
     readr,
     readxl,

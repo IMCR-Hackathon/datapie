@@ -1,10 +1,9 @@
-#' Creating a graphical user interface for creating ggplot-graphs.
+#' A data package interface for evaluation (datapie)
 #' 
 #' To run use \code{datapie_shiny()}
 #'
-#' @param dataset A dataset (optional).
-#' @return A GUI for visualizing data from \code{dataset}.
-
+#' @return A GUI for visual exploration of a dataset
+#' 
 #' @import ggplot2
 #' @import shiny
 #' @import shinyjs
@@ -12,34 +11,35 @@
 #' @import haven
 #' @import RColorBrewer
 #' @import magrittr
-#' @importFrom plotly ggplotly plotlyOutput renderPlotly
 #' @importFrom stringr str_replace_all
 #' @importFrom readr read_delim
 #' @export
-datapie_shiny <- function( dataset = NA ) {
+#' 
+datapie_shiny <- function() {
   
   # UI ------------------------------------------------------------------------
   
   ui <- fluidPage(
     
-    # Allows app to print messages to the console
+    # Allows app to print messages to the console for user understanding of
+    # ongoing processes
     shinyjs::useShinyjs(),
     
-    # Application title
+    # UI title
     headerPanel("datapie"),
 
-    # Define Tabs
+    # Define tabs
     mainPanel(
       width = 12,
+      
       tabsetPanel(
         type = "tabs",
         
         # Tab - Data ----------------------------------------------------------
-        
         tabPanel(
-          
           "Data",
           
+          # Options
           radioButtons(
             "data_input", 
             NULL,
@@ -51,13 +51,13 @@ datapie_shiny <- function( dataset = NA ) {
             selected = 1
           ),
           
-          # Load data (example)
+          # Load example data
           conditionalPanel(
             condition = "input.data_input=='1'",
             helpText("Sample data is loaded.")
           ),
           
-          # Load data (DOI)
+          # Load DOI data
           conditionalPanel(
             condition = "input.data_input=='2'",
             textInput(
@@ -89,16 +89,9 @@ datapie_shiny <- function( dataset = NA ) {
             selectInput(
               "file_type", 
               "Type of file:",
-              list(
-                "text (csv)" = "text",
-                "Excel" = "Excel",
-                "SPSS" = "SPSS",
-                "Stata" = "Stata",
-                "SAS" = "SAS"
-              ),
+              list("text (csv)" = "text"),
               selected = "text"
             ),
-            
             conditionalPanel(
               condition = "input.file_type=='text'",
               selectInput(
@@ -113,14 +106,13 @@ datapie_shiny <- function( dataset = NA ) {
                 selected = "Semicolon"
               )
             ),
-            
             actionButton(
               "submit_datafile_button",
               "Submit File"
             )
-            
           ),
           
+          # Messaging
           hr(),
           dataTableOutput("out_table"),
           h3(textOutput("download_done_message")),
@@ -133,6 +125,8 @@ datapie_shiny <- function( dataset = NA ) {
         tabPanel(
           "Report", 
           p(),
+          
+          # Create report
           conditionalPanel(
             condition = "input.tabs == 'Report'",
             conditionalPanel(
@@ -142,16 +136,26 @@ datapie_shiny <- function( dataset = NA ) {
               actionButton("generate_example_report", "Create Report"),
               p()
             ),
-            selectInput("report_to_display", "Reports created in this session:",
-                        choices = "",
-                        selected = "None selected"),
+            
+            # Select report to view
+            selectInput(
+              "report_to_display", 
+              "Reports created in this session:",
+              choices = "",
+              selected = "None selected"
+            ),
             p(),
             p(),
+            
+            # Download report
             downloadButton("download_report", "Download Report"),
             hr()
             
           ),
+          
+          # Print report to UI
           htmlOutput("report_html")
+          
         ),
         
         # Tab - Plot ----------------------------------------------------------
@@ -159,12 +163,15 @@ datapie_shiny <- function( dataset = NA ) {
         tabPanel(
           "Plot",
 
+          # Place controls in a row of columns above the plot
           fluidRow(
             
             # Tab - Plot - Column 1 -------------------------------------------
             column(
               4,
               p(),
+              
+              # Plot type
               selectInput(
                 inputId = "Type",
                 label = "Plot type:",
@@ -172,8 +179,6 @@ datapie_shiny <- function( dataset = NA ) {
                 selected = "None selected"
               ),
 
-              # FIXME: Add these capabilities:
-              # - Group data or facet row
               # Histogram or Boxplot
               conditionalPanel(
                 condition = "input.Type == 'Histogram' || input.Type == 'Boxplot' || input.Type == 'Scatter'",
@@ -195,7 +200,7 @@ datapie_shiny <- function( dataset = NA ) {
               # Scatter
               conditionalPanel(
                 condition = "input.Type == 'Scatter'",
-                # Y-var
+                # Y-variable
                 selectInput(
                   inputId = "y_var",
                   label = "Y-variable:",
@@ -208,14 +213,6 @@ datapie_shiny <- function( dataset = NA ) {
                   choices = c('None selected','character', 'numeric', 'date', 'factor'),
                   selected = "None selected"
                 )
-                # FIXME: Regression line methods using plotly
-                # # Regression line
-                # checkboxInput(
-                #   inputId = "line",
-                #   label = strong("Show regression line"),
-                #   value = FALSE
-                # ),
-                # Smoothing options
               )
               
             ),
@@ -224,22 +221,15 @@ datapie_shiny <- function( dataset = NA ) {
             column(
               3,
               p(),
+              
+              # Grouping
               selectInput(
                 "group",
                 "Group:",
                 choices = ""
               ),
-              # selectInput(
-              #   "facet_row",
-              #   "Facet row:",
-              #   choices = ""
-              # ),
-              # selectInput(
-              #   "facet_col",
-              #   "Facet column:",
-              #   choices = ""
-              # ),
-              # Group type (discrete or continuous)
+              
+              # Group type
               conditionalPanel(
                 condition = "input.Type == 'Scatter'",
                 selectInput(
@@ -249,6 +239,7 @@ datapie_shiny <- function( dataset = NA ) {
                   selected = "None selected"
                 )
               ),
+              
               # Opacity
               conditionalPanel(
                 condition = "input.Type == 'Scatter' || input.Type == 'Histogram' || input.Type == 'Boxplot'",
@@ -259,17 +250,8 @@ datapie_shiny <- function( dataset = NA ) {
                   max = 1, 
                   value = 0.8
                 )
-              ),
-              conditionalPanel(
-                condition = "input.Type == 'Scatter' || input.Type == 'Histogram' || input.Type == 'Boxplot'",
-                # X-range
-                uiOutput("data_range")
-              ),
-              conditionalPanel(
-                condition = "input.Type == 'Scatter'",
-                # Y-range
-                uiOutput("data_range_y")
               )
+              
             ),
             
             # Tab - Plot - Column 3 -------------------------------------------
@@ -277,85 +259,25 @@ datapie_shiny <- function( dataset = NA ) {
               4,
               offset = 1,
               p(),
+              
               # Title
               textInput(
                 "title_value", 
                 "Title:", 
                 value = "Title"
               ),
+              
               # Download
               downloadButton(
                 "download_plot_PNG",
                 "Download plot"
               )
-              # tabsetPanel(
-              # 
-              #   tabPanel(
-              #     "Text",
-              #     # Title
-              #     checkboxInput(
-              #       inputId = "add_title",
-              #       label = strong("Add title"),
-              #       value = FALSE
-              #     ),
-              #     conditionalPanel(
-              #       condition = "input.add_title == true",
-              #       textInput(
-              #         "title_value", 
-              #         "Title:", 
-              #         value = "Title"
-              #       )
-              #     ),
-              #     # Download
-              #     downloadButton(
-              #       "download_plot_PNG",
-              #       "Download plot"
-              #     )
-              #   )
-            
-            #     # Figure size
-            #     tabPanel(
-            #       "Size",
-            #       checkboxInput(
-            #         "fig_size",
-            #         strong("Adjust plot size on screen"), 
-            #         FALSE
-            #       ),
-            #       conditionalPanel(
-            #         condition = "input.fig_size",
-            #         numericInput(
-            #           "fig_height",
-            #           "Plot height (# pixels): ",
-            #           value = 600
-            #         ),
-            #         numericInput(
-            #           "fig_width", 
-            #           "Plot width (# pixels):", 
-            #           value = 1200
-            #         )
-            #       ),
-            #       checkboxInput(
-            #         "fig_size_download",
-            #         strong("Adjust plot size for download"), 
-            #         FALSE
-            #       ),
-            #       conditionalPanel(
-            #         condition = "input.fig_size_download",
-            #         numericInput(
-            #           "fig_height_download",
-            #           "Plot height (in cm):", 
-            #           value = 14
-            #         ),
-            #         numericInput(
-            #           "fig_width_download",
-            #           "Plot width (in cm):", 
-            #           value = 14
-            #         )
-            #       )
-            #     )
-              # )
+              
             )
+            
           ),
+          
+          # Tab - Plot - Plot area --------------------------------------------
           
           fluidRow(
             plotly:: plotlyOutput("out_plotly", height = "700px")
@@ -818,25 +740,25 @@ datapie_shiny <- function( dataset = NA ) {
         if (Type == "Scatter") {
           p <- "plotly::plot_ly(data = df, type = 'scatter', alpha = input_alpha, x = ~x_var, y = ~y_var, color = I('black'))"
         } else if (Type == "Histogram") {
-          p <- "plot_ly(data = df, type = 'histogram', alpha = input_alpha, x = ~x_var, color = I('black'))"
+          p <- "plotly::plot_ly(data = df, type = 'histogram', alpha = input_alpha, x = ~x_var, color = I('black'))"
         } else if (Type == "Boxplot") {
-          p <- "plot_ly(data = df, type = 'box', alpha = input_alpha, y = ~x_var, color = I('black'))"
+          p <- "plotly::plot_ly(data = df, type = 'box', alpha = input_alpha, y = ~x_var, color = I('black'))"
         }
         
         # Grouped plots
         if ((Type == "Scatter") & (group != "None selected")) {
           if (group_type == "factor") {
-            p <- "df %>% mutate(group = factor(group)) %>% plotly::plot_ly(type = 'scatter', alpha = input_alpha, x = ~x_var, y = ~y_var, color = ~group, colors = 'Dark2') %>% layout(annotations = list(yref = 'paper', xref = 'paper', y = 1.05, x = 1.1, text = 'group', showarrow = F))"
+            p <- "df %>% dplyr::mutate(group = factor(group)) %>% plotly::plot_ly(type = 'scatter', alpha = input_alpha, x = ~x_var, y = ~y_var, color = ~group, colors = 'Dark2') %>% plotly::layout(annotations = list(yref = 'paper', xref = 'paper', y = 1.05, x = 1.1, text = 'group', showarrow = F))"
           } else if (group_type == "continuous") {
-            p <- "df %>% mutate(group = as.numeric(group)) %>% plotly::plot_ly(type = 'scatter', alpha = input_alpha, x = ~x_var, y = ~y_var, color = ~group)"
+            p <- "df %>% dplyr::mutate(group = as.numeric(group)) %>% plotly::plot_ly(type = 'scatter', alpha = input_alpha, x = ~x_var, y = ~y_var, color = ~group)"
           }
         } else if ((Type == "Histogram") & (group != "None selected")) {
-          p <- "df %>% mutate(group = factor(group)) %>% plot_ly(type = 'histogram', alpha = input_alpha, x = ~x_var, color = ~group, colors = 'Dark2') %>% layout(barmode = 'overlay') %>% layout(annotations = list(yref = 'paper', xref = 'paper', y = 1.05, x = 1.1, text = 'group', showarrow = F))"
+          p <- "df %>% dplyr::mutate(group = factor(group)) %>% plotly::plot_ly(type = 'histogram', alpha = input_alpha, x = ~x_var, color = ~group, colors = 'Dark2') %>% plotly::layout(barmode = 'overlay') %>% plotly::layout(annotations = list(yref = 'paper', xref = 'paper', y = 1.05, x = 1.1, text = 'group', showarrow = F))"
         } else if ((Type == "Boxplot") & (group != "None selected")) {
           if ((group != "None selected") & (group2 != "None selected")) {
-            p <- "df %>% mutate(group = factor(group)) %>% mutate(group2 = factor(group2)) %>% plot_ly(type = 'box', alpha = input_alpha, x = ~group, y = ~x_var, color = ~group2, colors = 'Dark2') %>% layout(boxmode = 'group', annotations = list(yref = 'paper', xref = 'paper', y = 1.05, x = 1.1, text = 'group2', showarrow = F))"
+            p <- "df %>% dplyr::mutate(group = factor(group)) %>% dplyr::mutate(group2 = factor(group2)) %>% plotly::plot_ly(type = 'box', alpha = input_alpha, x = ~group, y = ~x_var, color = ~group2, colors = 'Dark2') %>% plotly::layout(boxmode = 'group', annotations = list(yref = 'paper', xref = 'paper', y = 1.05, x = 1.1, text = 'group2', showarrow = F))"
           } else {
-            p <- "df %>% mutate(group = factor(group)) %>% plot_ly(type = 'box', alpha = input_alpha, y = ~x_var, color = ~group, colors = 'Dark2') %>% layout(showlegend = TRUE) %>% layout(annotations = list(yref = 'paper', xref = 'paper', y = 1.05, x = 1.1, text = 'group', showarrow = F))"
+            p <- "df %>% dplyr::mutate(group = factor(group)) %>% plotly::plot_ly(type = 'box', alpha = input_alpha, y = ~x_var, color = ~group, colors = 'Dark2') %>% plotly::layout(showlegend = TRUE) %>% plotly::layout(annotations = list(yref = 'paper', xref = 'paper', y = 1.05, x = 1.1, text = 'group', showarrow = F))"
           }
           
         }
@@ -868,7 +790,7 @@ datapie_shiny <- function( dataset = NA ) {
         
         # Title
         if (title_value != "Title") {
-          p <- paste(p, " %>% layout(title = 'title_value')")
+          p <- paste(p, " %>% plotly::layout(title = 'title_value')")
         }
         
         # Performance enhancement with WebGL()
@@ -1111,45 +1033,45 @@ datapie_shiny <- function( dataset = NA ) {
     
     # Graph code - File -------------------------------------------------------
     
-    # string_upload_code <- reactive({
-    #   
-    #   file_in <- input$upload
-    #   
-    #   if (input$data_input == 3) {
-    #     
-    #     # Avoid error message while file is not uploaded yet
-    #     if (is.null(input$upload)) {
-    #     } else if (input$submit_datafile_button == 0) {
-    #     } else {
-    #       isolate({
-    #         if (input$file_type == "text") {
-    #           p <- paste0(
-    #             "readr::read_delim('", file_in$name, "', delim = '", input$upload_delim, "', ", "col_names = TRUE)"
-    #           )
-    #         } else if (input$file_type == "Excel") {
-    #           p <- paste0(
-    #             "readxl::read_excel(", file_in$name, ")"
-    #           )
-    #         } else if (input$file_type == "SPSS") {
-    #           p <- paste0(
-    #             "haven::read_sav(", file_in$name, ")"
-    #           )
-    #         } else if (input$file_type == "Stata") {
-    #           p <- paste0(
-    #             "haven::read_dta(", file_in$name, ")"
-    #           )
-    #         } else if (input$file_type == "SAS") {
-    #           p <- paste0(
-    #             "haven::read_sas(", file_in$name, ")"
-    #           )
-    #         }
-    #       })
-    #     }
-    #     
-    #   }
-    #   p
-    #   
-    # })
+    string_upload_code <- reactive({
+
+      file_in <- input$upload
+
+      if (input$data_input == 3) {
+
+        # Avoid error message while file is not uploaded yet
+        if (is.null(input$upload)) {
+        } else if (input$submit_datafile_button == 0) {
+        } else {
+          isolate({
+            if (input$file_type == "text") {
+              p <- paste0(
+                "readr::read_delim('", file_in$name, "', delim = '", input$upload_delim, "', ", "col_names = TRUE)"
+              )
+            } else if (input$file_type == "Excel") {
+              p <- paste0(
+                "readxl::read_excel(", file_in$name, ")"
+              )
+            } else if (input$file_type == "SPSS") {
+              p <- paste0(
+                "haven::read_sav(", file_in$name, ")"
+              )
+            } else if (input$file_type == "Stata") {
+              p <- paste0(
+                "haven::read_dta(", file_in$name, ")"
+              )
+            } else if (input$file_type == "SAS") {
+              p <- paste0(
+                "haven::read_sas(", file_in$name, ")"
+              )
+            }
+          })
+        }
+
+      }
+      p
+
+    })
     
   # Graphical/table output ----------------------------------------------------
   
@@ -1198,133 +1120,53 @@ datapie_shiny <- function( dataset = NA ) {
         
         # data sample r-code
         if(input$data_input == 1) {
-          gg_code <- string_code()
-          # gg_code <- str_replace_all(gg_code, "\\+ ", "+\n  ")
-          paste0(gg_code) # TESTING
-          # paste(
-          #   "## You can use the code below to make the 'Plot' tab figure.\n\n",
-          #   "# You will need the following package(s):\n",
-          #   "library(\"datapie\")\n",
-          #   "library(\"ggplot2\")\n\n",
-          #   "# The code below will load the sample data from\n",
-          #   "# library(datapie) into your current R session.\n",
-          #   "# df <- datapie::data_example\n\n",
-          #   "# The code below will generate the 'Plot' tab figure.\n",
-          #   "graph <- ",
-          #   gg_code,
-          #   "\ngraph\n\n",
-          #   "# If you want the plot to be interactive,\n",
-          #   "# you need the following package(s):\n",
-          #   "library(\"plotly\")\n\n",
-          #   "# The code below will generate the 'Interactive Plot'\n",
-          #   "# tab figure.\n",
-          #   "ggplotly(graph)\n\n",
-          #   "# The code below will save your plot.\n",
-          #   "ggsave('my_graph.pdf', graph, width = ",
-          #   width_download(),
-          #   ", height = ",
-          #   height_download(),
-          #   ", units = 'cm')",
-          #   sep = ""
-          # )
+          
+          paste0(
+            "# You can use the code below to make the 'Plot' tab figure.\n\n",
+            "library(\'datapie\')\n",
+            "df <- datapie::data_example\n",
+            "p <- ",
+            string_code(),
+            "\np\n"
+          )
+          
         }
         
         # doi data r-code
         else if (input$data_input == 2) {
-          gg_code <- string_code()
-          # gg_code <- str_replace_all(gg_code, "\\+ ", "+\n  ")
-          paste0(gg_code)
+
+          paste0(
+            "# You can use the code below to make the 'Plot' tab figure:\n\n",
+            "library(\'datapie\')\n",
+            "datapie::data_package_download(data.pkg.doi = '",
+            input$doi,
+            "')\n",
+            "df_list <- datapie::data_package_read()\n",
+            "df <- df_list$",
+            input$repo_file,
+            "$data\n",
+            "p <- ",
+            string_code(),
+            "\np\n"
+          )
           
-          # paste(
-          #   "## You can use the code below to make the 'Plot' tab figure.\n\n",
-          #   "# You will need the following package(s):\n",
-          #   "library(\"datapie\")\n",
-          #   "library(\"ggplot2\")\n\n",
-          #   "# The code below will download data from a DOI to a temporary\n",
-          #   "# directory on your computer. The DOI in the code below is\n",
-          #   "# the DOI you entered in the 'Data' tab.\n",
-          #   "datapie::data_package_download(data.pkg.doi = '",
-          #   input$doi,
-          #   "')\n\n",
-          #   "# The code below will save the data from the the DOI you\n",
-          #   "# entered in the 'Data' tab to your current R session.\n",
-          #   "df_list <- datapie::data_package_read()\n\n",
-          #   "# The code below will create a variable df to hold the data\n",
-          #   "# file you selected in the 'Data' tab.\n",
-          #   "df <- df_list$",
-          #   input$repo_file,
-          #   "$data\n\n",
-          #   "# The code below will generate the 'Plot' tab figure:\n",
-          #   "graph <- ",
-          #   gg_code,
-          #   "\ngraph\n\n",
-          #   "# If you want the plot to be interactive,\n",
-          #   "# you need the following package(s):\n",
-          #   "library(\"plotly\")\n\n",
-          #   "# The code below will generate the 'Interactive Plot'\n",
-          #   "# tab figure.\n",
-          #   "ggplotly(graph)\n\n",
-          #   "# The code below will save your plot.\n",
-          #   "ggsave('my_graph.pdf', graph, width = ",
-          #   width_download(),
-          #   ", height = ",
-          #   height_download(),
-          #   ", units = 'cm')",
-          #   sep = ""
-          # )
         } else if (input$data_input == 3) {
           
-          # gg_code <- string_code()
-          # gg_code <- str_replace_all(gg_code, "\\+ ", "+\n  ")
-          
-          # upcode <- string_upload_code()
-          # upcode <- str_replace_all(upcode, "\\+ ", "+\n  ")
-          
-          # paste(
-          #   "## You can use the code below to make the 'Plot' tab figure.\n\n",
-          #   "# You will need the following package(s):\n",
-          #   "library(\"datapie\")\n",
-          #   "library(\"ggplot2\")\n\n",
-          #   
-          #   "# The code below will load your data:\n",
-          #   "# df <- ", upcode, "\n\n",
-          #   "# The code below will generate the 'Plot' tab figure:\n",
-          #   "graph <- ",
-          #   gg_code,
-          #   "\ngraph\n\n",
-          #   "# If you want the plot to be interactive,\n",
-          #   "# you need the following package(s):\n",
-          #   "library(\"plotly\")\n\n",
-          #   "# The code below will generate the 'Interactive Plot'\n",
-          #   "# tab figure:\n",
-          #   "ggplotly(graph)\n\n",
-          #   "# The code below will save your plot:\n",
-          #   "ggsave('my_graph.pdf', graph, width = ",
-          #   width_download(),
-          #   ", height = ",
-          #   height_download(),
-          #   ", units = 'cm')",
-          #   sep = ""
-          # )
+          paste0(
+            "# You can use the code below to make the 'Plot' tab figure:\n\n",
+            "library(\'datapie\')\n",
+            "df <-", string_upload_code(), "\n",
+            "p <- ",
+            string_code(), "\n",
+            "p"
+          )
           
         }
 
         })
-
-  # Download codes ------------------------------------------------------------
+      
+      # Download graph --------------------------------------------------------
   
-    output$download_plot_PDF <- downloadHandler(
-        filename <- function() {
-          paste("Figure_ggplotGUI_", Sys.time(), ".pdf", sep = "")
-        },
-        content <- function(file) {
-          df <- df_shiny()
-          p <- eval(parse(text = string_code()))
-          ggsave(file, p, width = width_download(),
-                 height = height_download(), units = "cm")
-        },
-        contentType = "application/pdf" # MIME type of the image
-    )
       output$download_plot_PNG <- downloadHandler(
         filename <- function() {
           paste("Figure_ggplotGUI_", Sys.time(), ".png", sep = "")
@@ -1332,62 +1174,11 @@ datapie_shiny <- function( dataset = NA ) {
         content <- function(file) {
           df <- df_shiny()
           p <- eval(parse(text = string_code()))
-          ggsave(file, p, width = width_download(),
-                 height = height_download(), units = "cm")
+          plotly::export(p, file)
         },
         contentType = "application/png" # MIME type of the image
       )
-    output$download_plot_Tiff <- downloadHandler(
-        filename <- function() {
-          paste("Figure_ggplotGUI_", Sys.time(), ".tiff", sep = "")
-        },
-        content <- function(file) {
-          df <- df_shiny()
-          p <- eval(parse(text = string_code()))
-          ggsave(file, p, width = width_download(),
-                 height = height_download(), units = "cm")
-        },
-        contentType = "application/tiff" # MIME type of the image
-      )
-    # FIXME: Download interactive plots. These objects need to be conditionally
-    # linked to actions occuring on the interactive plot tab. This could be 
-    # done by refactoring the left pannel in two separate conditions rather
-    # than the combined approach currently used.
-    #
-    # output$download_interactive_plot_PDF <- downloadHandler(
-    #   filename <- function() {
-    #     paste("Figure_ggplotlyGUI_", Sys.time(), ".pdf", sep = "")
-    #   },
-    #   content <- function(file) {
-    #     df <- df_shiny()
-    #     p <- eval(parse(text = string_code()))
-    #     ggsave(file, p, width = width_download(),
-    #            height = height_download(), units = "cm")
-    #   },
-    #   contentType = "application/pdf" # MIME type of the image
-    # )
-    # output$download_interactive_plot_Tiff <- downloadHandler(
-    #   filename <- function() {
-    #     paste("Figure_ggplotlyGUI_", Sys.time(), ".tiff", sep = "")
-    #   },
-    #   content <- function(file) {
-    #     df <- df_shiny()
-    #     p <- eval(parse(text = string_code()))
-    #     ggsave(file, p, width = width_download(),
-    #            height = height_download(), units = "cm")
-    #   },
-    #   contentType = "application/tiff" # MIME type of the image
-    # )
-    
-     output$downloadData <- downloadHandler(
-       filename = function() {
-         paste('data-', Sys.Date(), '.csv', sep='')
-       },
-       content = function(con) {
-         write.csv(data, con)
-       }
-     )
-     
+
   # Scale bar -----------------------------------------------------------------
   
      # X-variable
@@ -1477,4 +1268,5 @@ datapie_shiny <- function( dataset = NA ) {
   
   # Construct the shinyApp ----------------------------------------------------
   shinyApp(ui, server)
+  
 }
