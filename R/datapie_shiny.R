@@ -921,16 +921,16 @@ datapie_shiny <- function() {
   
       output$out_plotly <- renderPlotly({
         # evaluate the string RCode as code
-        df <- get_subset()#note: this is a subset of data from df_shiny as we select the range of interest()
+        df <- df_shiny()
         p <- eval(parse(text = string_code()))
         p
       })
   
-  # Generate code for output --------------------------------------------------
+  # Code ----------------------------------------------------------------------
       
       output$out_r_code <- renderText({
         
-        # data sample r-code
+        # Code - Sample -------------------------------------------------------
         if(input$data_input == 1) {
           
           paste0(
@@ -942,7 +942,7 @@ datapie_shiny <- function() {
             "\np\n"
           )
           
-          # doi data r-code
+          # Code - DOI --------------------------------------------------------
         } else if (input$data_input == 2) {
 
           paste0(
@@ -960,6 +960,7 @@ datapie_shiny <- function() {
             "\np\n"
           )
           
+          # Code - File -------------------------------------------------------
         } else if (input$data_input == 3) {
           
           paste0(
@@ -975,7 +976,7 @@ datapie_shiny <- function() {
 
       })
       
-      # Download graph --------------------------------------------------------
+      # Download plot ---------------------------------------------------------
       
       output$download_plot_PNG <- downloadHandler(
         filename <- function() {
@@ -988,78 +989,6 @@ datapie_shiny <- function() {
         },
         contentType = "application/png" # MIME type of the image
       )
-      
-      # Scale bar -------------------------------------------------------------
-      
-      # X-variable
-      output$data_range <- renderUI({
-        # If missing input, return to avoid error later in function
-        if(is.null(input$x_var))
-          return()
-        
-        # Get the data set with the selected column
-        df <- df_shiny()
-        
-        if (input$x_var!="") {
-          df1 <-df[[input$x_var]]
-          if (class(df1)[1]=="numeric") {
-            sliderInput("range", "X-range:", min = min(df1), max = max(df1), value = c(min(df1),max(df1)))
-          } else {
-            #helpText("There is no scale bar for non-numerical variables.")
-          }
-        } else {return()}
-        
-      })
-      
-      # Y-variable
-      output$data_range_y <- renderUI({
-        # If missing input, return to avoid error later in function
-        if(is.null(input$y_var))
-          return()
-        
-        # Get the data set with the selected column
-        df <- df_shiny()
-        
-        if (input$y_var!="") {
-          df1 <-df[[input$y_var]]
-          
-          if (class(df1)[1]=="numeric") {
-            sliderInput("range_y", "Y-range:", min = min(df1), max = max(df1), value = c(min(df1),max(df1)))
-          } else {
-            #helpText("There is no scale bar for non-numerical variables.")
-          }
-        } else {
-          return()
-        }
-      })
-      
-      # Subset data from scale bar --------------------------------------------
-      
-      get_subset <- reactive({
-        min_value <- input$range[1]
-        max_value <- input$range[2]
-        
-        df <- df_shiny()
-        
-        if (class(df[[input$x_var]])[1]=="numeric"&!is.null(min_value)) {
-          df2<-df %>% plotly::filter(df[,input$x_var]>=min_value&df[,input$x_var]<=max_value)
-        } else {
-          df2<-df
-        }
-        
-        # df2
-        min_value <- input$range_y[1]
-        max_value <- input$range_y[2]
-        
-        if (class(df2[[input$y_var]])[1]=="numeric"&!is.null(min_value)) {
-          df3<-df2 %>% plotly::filter(df2[,input$y_var]>=min_value&df2[,input$y_var]<=max_value)
-        } else {
-          df3<-df2
-        }
-        
-        df3
-        
-      })
       
       # End R-session when browser closed
       session$onSessionEnded(stopApp)
