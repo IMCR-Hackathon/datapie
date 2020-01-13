@@ -9,7 +9,8 @@
 #' @param varname (character) Name for a POSIXct-type column within the given data frame.
 #'
 #' @return Ggplot-type graphs of the frequency of data occurring at different time frequencies, if POSIX type data.
-#' 
+#'
+#' @import ggplot2 
 #'
 
 freqclocks_forPOSIX <- function(entity_df, varname) {

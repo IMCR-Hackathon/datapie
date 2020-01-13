@@ -8,6 +8,8 @@
 #' @param entity_df (data.frame) A data frame containing data. In this package context, this is most often the "data" child element within a metajam list output for a data entity.
 #' @param varname (character) Name for a Date-type column within the given data frame.
 #' 
+#' @import ggplot2
+#' 
 #' @return
 #'   (ggplot clocks) Of the frequency of data occurring at different time frequencies, if Date type data.
 

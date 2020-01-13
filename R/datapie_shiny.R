@@ -916,7 +916,7 @@ datapie_shiny <- function() {
       width_download <- reactive({ input$fig_width_download })
       height_download <- reactive({ input$fig_height_download })
   
-      output$out_plotly <- renderPlotly({
+      output$out_plotly <- plotly::renderPlotly({
         # evaluate the string RCode as code
         df <- df_shiny()
         p <- eval(parse(text = string_code()))

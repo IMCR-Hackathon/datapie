@@ -9,6 +9,8 @@
 #'
 #' @return For all variables, function returns a data availability plot over the study area. For categorical variables, function returns an extra plot showing most prevalent level of that variable in each spatial grid cell over the study area. For numeric variables, function returns an extra plot showing mean of that variable in each spatial grid cell over the study area. y_dim and lon are binned; there are 50 bins normalized to attempt to enforce equal scales along each dimension.
 #'
+#' @import ggplot2
+#'
 #' @export
 
 space_plot <-

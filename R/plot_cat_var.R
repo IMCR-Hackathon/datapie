@@ -8,6 +8,8 @@
 #' @param entity_df (data.frame) A data.frame containing entity-level data. The "data" child element of an entity-level list object in metajam output format.
 #' @param varname (character) Name of variable of interest.
 #'
+#' @import ggplot2
+#'
 #' @return
 #'   A ggplot2 object containing the histogram for that column
 

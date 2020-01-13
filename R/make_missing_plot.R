@@ -9,6 +9,8 @@
 #' @title Plot missing values in a vector.
 #' 
 #' @param var (data.frame) Single-column data.frame whose missing values are to be graphed
+#' 
+#' @import ggplot2
 #'
 #' @return
 #'   A ggplot2 graph object
