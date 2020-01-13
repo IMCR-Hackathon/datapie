@@ -267,7 +267,7 @@ datapie_shiny <- function() {
               # Download
               downloadButton(
                 "download_plot_PNG",
-                "Download plot"
+                "Download Plot"
               )
               
             )
