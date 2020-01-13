@@ -2,16 +2,18 @@
 % Please edit documentation in R/datapie_shiny.R
 \name{datapie_shiny}
 \alias{datapie_shiny}
-\title{Creating a graphical user interface for creating ggplot-graphs.}
+\title{A data package interface for evaluation (datapie)}
 \usage{
-datapie_shiny(dataset = NA)
-}
-\arguments{
-\item{dataset}{A dataset (optional).}
+datapie_shiny()
 }
 \value{
-A GUI for visualizing data from \code{dataset}.
+A UI for visual exploration of a dataset
 }
 \description{
-To run use \code{datapie_shiny()}
+A data package interface for evaluation (datapie)
+}
+\examples{
+# Open the UI
+datapie_shiny()
+
 }

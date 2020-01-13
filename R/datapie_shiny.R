@@ -1,18 +1,15 @@
 #' A data package interface for evaluation (datapie)
-#' 
-#' To run use \code{datapie_shiny()}
 #'
-#' @return A GUI for visual exploration of a dataset
+#' @return A UI for visual exploration of a dataset
 #' 
-#' @import ggplot2
 #' @import shiny
 #' @import shinyjs
-#' @import readxl
-#' @import haven
 #' @import RColorBrewer
-#' @import magrittr
-#' @importFrom stringr str_replace_all
-#' @importFrom readr read_delim
+#' 
+#' @examples 
+#' # Open the UI
+#' datapie_shiny()
+#' 
 #' @export
 #' 
 datapie_shiny <- function() {
@@ -747,7 +744,7 @@ datapie_shiny <- function() {
         } else {
           isolate({
             if (input$file_type == "text") {
-              data <- read_delim(file_in$datapath,
+              data <- readr::read_delim(file_in$datapath,
                                  delim = input$upload_delim,
                                  col_names = TRUE)
             }
@@ -835,7 +832,7 @@ datapie_shiny <- function() {
         p <- paste0(p, " %>% plotly::toWebGL()")
         
         # Replace variables with values
-        p <- str_replace_all(
+        p <- stringr::str_replace_all(
           p,
           c("y_var" = y_var,
             "x_var" = x_var,
@@ -848,7 +845,7 @@ datapie_shiny <- function() {
         )
         
         # Make code legible
-        p <- str_replace_all(p, ",\n    \\)", "\n  \\)")
+        p <- stringr::str_replace_all(p, ",\n    \\)", "\n  \\)")
         p
         
       }
