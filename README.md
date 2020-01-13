@@ -6,9 +6,9 @@
 
 # datapie
 
-Interactively explore the contents of a data package from the DataONE Network. Input the Digital Object Identifier (DOI) and get a variable-wise summary report and Shiny R Interface for basic plotting. This tool accelerates data reuse by enabling a deeper understanding than can be obtained from the metadata alone.
+Visually explore the contents of a data package found in the [DataONE Search Engine](https://search.dataone.org/data). Input the Digital Object Identifier (DOI) and get a variable-wise summary report and interactive plotting environment. This tool accelerates data reuse by enabling a deeper understanding than can be obtained from the metadata alone.
 
-## Install
+## Install and run
 
 ```
 # Installation requires the remotes package
@@ -18,9 +18,10 @@ library(remotes)
 # Install datapie
 remotes::install_github('IMCR-Hackathon/datapie')
 library(datapie)
-```
 
-## Run
+# Open datapie
+datapie_shiny()
+```
 
 See website articles for more information on:
 * Finding a data package and loading the DOI
@@ -30,7 +31,8 @@ See website articles for more information on:
 
 ## Road map
 
-* Add support for spatial data types.
+* Extend support to relevant plot types of the `plotly` package.
+* Support spatial data types.
 * Supplement reports with metadata (if it exists).
 * Develop guidelines for integrating this app into websites.
 
