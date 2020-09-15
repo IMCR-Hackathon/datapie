@@ -4,8 +4,13 @@
 \alias{static_report_complete}
 \title{Wrapper function to generate complete HTML report: entity-level  plus variable-level reports for one entity.}
 \usage{
-static_report_complete(entity_list, report_filename = NULL, output_path,
-  DOI = NULL, shiny = F)
+static_report_complete(
+  entity_list,
+  report_filename = NULL,
+  output_path,
+  DOI = NULL,
+  shiny = F
+)
 }
 \arguments{
 \item{entity_list}{(list) A list containing information on a single data entity in metajam output format.}

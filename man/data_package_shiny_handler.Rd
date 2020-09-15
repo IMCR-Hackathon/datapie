@@ -4,8 +4,11 @@
 \alias{data_package_shiny_handler}
 \title{A data_package_* handler for the shiny app}
 \usage{
-data_package_shiny_handler(data.pkg.doi = NA, current.data = NULL,
-  download.dir = NULL)
+data_package_shiny_handler(
+  data.pkg.doi = NA,
+  current.data = NULL,
+  download.dir = NULL
+)
 }
 \arguments{
 \item{data.pkg.doi}{The doi of the package being downloaded.}
