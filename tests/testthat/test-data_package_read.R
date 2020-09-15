@@ -27,9 +27,8 @@ test_that("Validate output structure", {
   
   expect_true(
     all(
-      names(output) %in% c('Alaska_Schools_Rentention2009_15.xlsx',
-                           'Alaska_Schools_Rentention2009_15.csv',
-                           'Alaska_Schools_Rentention_Definitions.csv')
+      names(output) %in% c('doi_10.18739_A2RV0D11H.Alaska_Schools_Rentention_Definitions__csv',
+                           'doi_10.18739_A2RV0D11H.Alaska_Schools_Rentention2009_15__csv')
     )
   )
   
@@ -54,7 +53,7 @@ test_that("Validate output structure", {
             unlist(output, recursive = FALSE), class
           )
         )
-      ) %in% c('tbl_df', 'tbl', 'data.frame', 'spec_tbl_df')
+      ) %in% c('tbl_df', 'tbl', 'data.frame', 'spec_tbl_df', 'data.table')
     )
   )
   
