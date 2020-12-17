@@ -115,7 +115,8 @@ data_package_read <- function(data.pkg.path = NULL){
   
   for (i in seq_along(output)) {
     if (read_fnc[i] == "data.table::fread") {
-     output[[i]][["data"]][output[[i]][["data"]] == ""] <- NA
+      # FIXME: Needs a better solution
+      try(output[[i]][["data"]][output[[i]][["data"]] == ""] <- NA, silent = TRUE)
     }
   }
   
@@ -171,7 +172,7 @@ data_package_read <- function(data.pkg.path = NULL){
 #' 
 #' @return (character) Named character vector of recommended read functions. Indices correspond to directory order as supplied. Names are the directory names. 
 #' @importFrom readxl excel_sheets
-
+#' 
 guess_read_fnc <- function(pkg_dir_full_paths) {
   file_ext <- sub(".*__", "", pkg_dir_full_paths)
   pkg_dir <- sub(".*/", "", pkg_dir_full_paths)
