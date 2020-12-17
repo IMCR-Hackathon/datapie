@@ -8,7 +8,7 @@ Authors@R:
     person(given='Colin A.', family= 'Smith', email='colin.smith@wisc.edu', role=c('aut', 'cre'), comment = c(ORCID = '0000-0003-2261-9931')), 
     person(given='Alesia', family='Hallmark', email = 'alesiahallmark@unm.edu', role = c('aut')),
     person(given='Li', family='Kui', email = 'lkui@ucsb.edu', role = c('aut')),
-    person(given='Jason J.', family='Mercer', email = 'jmercer4@uwyo.edu', role = c('aut')),
+    person(given='Jason J.', family='Mercer', email = 'jmercer4@uwyo.edu', role = c('aut'), comment = c(ORCID = '0000-0002-6193-5032')),
     person(given='An T.', family='Nguyen', email = 'enthusiast@utexas.edu', role = c('aut')),
     person(given='John H.', family='Porter', email = 'jhp72e@virginia.edu', role = c('aut')),
     person(given='Sheila', family='Saia', email = 'ssaia@ncsu.edu', role = c('aut')),
@@ -24,7 +24,7 @@ Imports:
     ggplot2,
     lubridate,
     magrittr,
-    metajam,
+    metajam (>= 0.2.3),
     plotly,
     processx,
     RColorBrewer,
@@ -38,7 +38,6 @@ Imports:
     tidyverse,
     usethis
 Remotes:
-    clnsmth/metajam    
 License: MIT
 BugReports: https://github.com/IMCR-Hackathon/datapie/issues
 URL: https://github.com/IMCR-Hackathon/datapie
